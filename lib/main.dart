@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smart_shop/Screens/Home/home.dart';
 import 'package:smart_shop/Utils/Constants/app_constants.dart';
 import 'package:smart_shop/Utils/app_theme.dart';
+import 'package:smart_shop/screens/Map/map.dart';
+import 'package:smart_shop/screens/Onboarding/onboarding.dart';
+import 'package:smart_shop/screens/Settings/settings.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,6 +14,10 @@ void main() {
       builder: (context, child) => MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Home(),
+        initialRoute: Home.routeName,
+        routes: {
+          Map.routeName: (context) => Map(),
+        },
       ),
       designSize: const Size(375, 812),
       // Example design size

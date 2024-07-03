@@ -17,6 +17,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:smart_shop/dummy/dummy_data.dart';
 import 'package:smart_shop/Common/Widgets/shimmer_effect.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:smart_shop/screens/Map/map.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -32,7 +33,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       key: _key,
       appBar: _buildCustomAppBar(context),
       drawer: _buildDrawer(context),
@@ -130,6 +130,18 @@ class _HomeState extends State<Home> {
                       style: FontStyles.montserratRegular18(),
                     ),
                   ),
+                  ListTile(
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(context, Map.routeName);
+                    },
+                    leading: const Icon(Icons.map_outlined,
+                        color: AppColors.primaryLight),
+                    title: Text(
+                      'Map',
+                      style: FontStyles.montserratRegular18(),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -207,7 +219,8 @@ class _HomeState extends State<Home> {
   Widget _buildCatalogue() {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, Catalogue.routeName, arguments: [true,true]);
+        Navigator.pushNamed(context, Catalogue.routeName,
+            arguments: [true, true]);
       },
       child: Container(
         margin: EdgeInsets.only(
