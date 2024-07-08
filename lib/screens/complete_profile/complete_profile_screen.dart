@@ -9,6 +9,12 @@ class CompleteProfileScreen extends StatelessWidget {
   const CompleteProfileScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments
+        as Map<String, dynamic>?; // Assuming you used named arguments
+    String email = args?['email'] as String;
+    String password = args?['password'] as String;
+
+    print(email + password);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign Up'),
