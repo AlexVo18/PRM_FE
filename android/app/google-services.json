@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "792031155592",
+    "project_id": "legoandroidapp-426102",
+    "storage_bucket": "legoandroidapp-426102.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792031155592:android:7912bc2b2543f4acac163d",
+        "android_client_info": {
+          "package_name": "com.example.demo_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_HWzaooVt0fBxuxCW3LHoTWeH3nsoUuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792031155592:android:0b2c42c90e085dd4ac163d",
+        "android_client_info": {
+          "package_name": "com.example.lego_android_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_HWzaooVt0fBxuxCW3LHoTWeH3nsoUuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

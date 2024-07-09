@@ -32,6 +32,9 @@ const String kMatchPassError = "Passwords don't match";
 const String kNamelNullError = "Please Enter your name";
 const String kPhoneNumberNullError = "Please Enter your phone number";
 const String kAddressNullError = "Please Enter your address";
+const String kWeekPassError = "The password provided is too weak";
+const String kEmailExist = "The account already exists for that email";
+const String staffEmail = "staff@legostore.com";
 
 final otpInputDecoration = InputDecoration(
   contentPadding: const EdgeInsets.symmetric(vertical: 16),

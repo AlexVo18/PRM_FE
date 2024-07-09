@@ -46,7 +46,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     } catch (error) {
       setState(() {
         _hasError = true;
-        _isLoading = false;
+        _isLoading = false; 
       });
       print('Error fetching Lego detail: $error');
     }

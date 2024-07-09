@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -64,9 +66,22 @@ class _ForgotPassFormState extends State<ForgotPassForm> {
           FormError(errors: errors),
           const SizedBox(height: 8),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 // Do what you want to do
+                await FirebaseAuth.instance
+                    .sendPasswordResetEmail(email: email!.trim());
+
+                toastification.show(
+                  context: context,
+                  type: ToastificationType.success,
+                  style: ToastificationStyle.flat,
+                  title: const Text('Send email successfully'),
+                  alignment: Alignment.topCenter,
+                  autoCloseDuration: const Duration(seconds: 2),
+                  borderRadius: BorderRadius.circular(100.0),
+                  boxShadow: lowModeShadow,
+                );
               }
             },
             child: const Text("Continue"),
