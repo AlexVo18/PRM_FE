@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/models/Account.dart';
+import 'package:shop_app/services/AccountRequest.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../components/custom_surfix_icon.dart';
@@ -131,6 +134,17 @@ class _SignFormState extends State<SignForm> {
                           email: email!, password: password!);
 
                   KeyboardUtil.hideKeyboard(context);
+                  //save to storage
+
+                  final accountRequest = AccountRequest();
+
+                  Account account =
+                      await accountRequest.getAccountDetail(email!);
+
+                  if (account != null) {
+                    Account.saveUser(account);
+                  }
+
                   Navigator.pushNamed(context, LoginSuccessScreen.routeName);
                 } on FirebaseAuthException catch (e) {
                   toastification.show(

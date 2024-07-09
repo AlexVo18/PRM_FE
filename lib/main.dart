@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shop_app/screens/splash/splash_screen.dart';
+import 'package:shop_app/utils.dart';
 
 import 'routes.dart';
 import 'theme.dart';
@@ -7,8 +11,6 @@ import 'theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
-
 
 Future<void> main() async {
   // Initialize Firebase asynchronously before creating the MaterialApp widget
@@ -35,6 +37,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-

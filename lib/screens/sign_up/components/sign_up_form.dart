@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shop_app/models/AccountRegister.dart';
+import 'package:shop_app/models/Account.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
-import 'package:shop_app/services/userRequest.dart';
+import 'package:shop_app/services/AccountRequest.dart';
 import 'package:toastification/toastification.dart';
 
 import '../../../components/custom_surfix_icon.dart';
@@ -245,15 +245,17 @@ class _SignUpFormState extends State<SignUpForm> {
                     password: password!,
                   );
                   //add to db
-                  final registerUser = AccountResgister(
+                  final registerUser = Account(
                       email: email!,
                       displayName: name!,
                       address: address!,
-                      phoneNumber: phoneNumber!);
+                      phoneNumber: phoneNumber!,
+                      profilePicUrl:
+                          "https://firebasestorage.googleapis.com/v0/b/legoandroidapp-426102.appspot.com/o/Profile%20Image.png?alt=media&token=6e00421c-ad7a-4195-9792-c772e9a052c1");
 
-                  final userRequest = UserRequest();
+                  final accountRequest = AccountRequest();
 
-                  await userRequest.createAccount(registerUser);
+                  await accountRequest.createAccount(registerUser);
 
                   toastification.show(
                     context: context,
