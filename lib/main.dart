@@ -2,8 +2,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/screens/splash/splash_screen.dart';
-import 'package:shop_app/utils.dart';
+import 'package:shop_app/utils/preUtils.dart';
+import 'package:shop_app/utils/utils.dart';
 
 import 'routes.dart';
 import 'theme.dart';
@@ -18,6 +20,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  PrefUtil.init();
 
   runApp(MyApp());
 }
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'The Flutter Way - Template',
+      title: 'lego App',
       theme: AppTheme.lightTheme(context),
       initialRoute: SplashScreen.routeName,
       routes: routes,

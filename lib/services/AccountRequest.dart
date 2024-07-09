@@ -54,6 +54,28 @@ class AccountRequest {
     }
   }
 
+  Future<List<Account>> getAccounts() async {
+    final url = Uri.parse('$baseUrl/rest/Account');
+
+    final response = await http.get(url, headers: {
+      'X-API-KEY': key,
+      'Content-Type': 'application/json',
+      'charset': 'utf-8',
+    });
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data =
+          json.decode(utf8.decode(response.bodyBytes))['data'];
+      if (data.isNotEmpty) {
+        return data.map((json) => Account.fromJson(json)).toList();
+      } else {
+        throw Exception('No account details found');
+      }
+    } else {
+      throw Exception('Failed to fetch account details');
+    }
+  }
+
   Future<void> uploadAvatarImage(String email, String pictureUrl) async {
     final url = Uri.parse('$baseUrl/custom/updateAccountPic');
 

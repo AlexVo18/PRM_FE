@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shop_app/models/Account.dart';
 import 'package:shop_app/services/AccountRequest.dart';
 import 'package:shop_app/services/firebaseStorage.dart';
-import 'package:shop_app/utils.dart';
+import 'package:shop_app/utils/utils.dart';
 
 class ProfilePic extends StatefulWidget {
   const ProfilePic({Key? key}) : super(key: key);

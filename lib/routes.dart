@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:shop_app/screens/chat/chatScreen.dart';
+import 'package:shop_app/screens/chat_staff/chatStaffScreen.dart';
 import 'package:shop_app/screens/products/products_screen.dart';
 
 import 'screens/cart/cart_screen.dart';
@@ -30,4 +32,9 @@ final Map<String, WidgetBuilder> routes = {
   DetailsScreen.routeName: (context) => const DetailsScreen(),
   CartScreen.routeName: (context) => const CartScreen(),
   ProfileScreen.routeName: (context) => const ProfileScreen(),
+  ChatStaffScreen.routeName: (context) => const ChatStaffScreen(),
+  ChatScreen.routeName: (context) => const ChatScreen(
+        emailSend: '',
+        emailReceive: '',
+      ),
 };
