@@ -23,6 +23,15 @@ class Account {
     };
   }
 
+  Map<String, dynamic> toMapWithoutPic() {
+    return {
+      'Email': email,
+      'DisplayName': displayName,
+      'Address': address,
+      'PhoneNumber': phoneNumber,
+    };
+  }
+
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
       email: json['Email'] ?? '',

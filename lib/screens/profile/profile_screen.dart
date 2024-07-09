@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:shop_app/models/Account.dart';
+import 'package:shop_app/screens/profile_update/profile_update_screen.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
-import 'package:shop_app/services/AccountRequest.dart';
 import 'package:toastification/toastification.dart';
 
 import 'components/profile_menu.dart';
@@ -26,9 +25,10 @@ class ProfileScreen extends StatelessWidget {
             const ProfilePic(),
             const SizedBox(height: 20),
             ProfileMenu(
-              text: "My Account",
+              text: "Profile",
               icon: "assets/icons/User Icon.svg",
-              press: () => {},
+              press: () =>
+                  {Navigator.pushNamed(context, ProfileUpdateScreen.routeName)},
             ),
             ProfileMenu(
               text: "Notifications",

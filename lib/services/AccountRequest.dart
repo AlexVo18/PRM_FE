@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shop_app/constants/constants.dart';
 import 'package:shop_app/models/Account.dart';
-import 'package:shop_app/models/Lego.dart';
-import 'package:shop_app/models/LegoDetail.dart';
 
 class AccountRequest {
   Future<void> createAccount(Account account) async {
@@ -21,13 +19,31 @@ class AccountRequest {
     }
   }
 
+  Future<void> updateAccount(Account account) async {
+    final url = Uri.parse('$baseUrl/custom/updateAccount');
+
+    final body = jsonEncode(account.toMapWithoutPic());
+
+    final response =
+        await http.post(url, headers: {'X-API-KEY': '$key'}, body: body);
+
+    if (response.statusCode == 200) {
+    } else {
+      throw Exception('Failed to add account');
+    }
+  }
+
   Future<Account> getAccountDetail(String email) async {
     final url = Uri.parse('$baseUrl/rest/Account/$email');
 
-    final response = await http.get(url, headers: {'X-API-KEY': '$key'});
+    final response = await http.get(url, headers: {
+      'X-API-KEY': key,
+      'Content-Type': 'application/json',
+      'charset': 'utf-8',
+    });
 
     if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+      final data = json.decode(utf8.decode(response.bodyBytes));
       if (data['data'] != null && data['data'].isNotEmpty) {
         return Account.fromJson(data['data']);
       } else {

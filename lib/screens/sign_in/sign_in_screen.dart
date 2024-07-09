@@ -14,7 +14,7 @@ class SignInScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Sign In"),
       ),
-      body: SafeArea(
+      body: const SafeArea(
         child: SizedBox(
           width: double.infinity,
           child: Padding(
@@ -22,8 +22,8 @@ class SignInScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  const SizedBox(height: 16),
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     "Welcome Back",
                     style: TextStyle(
                       color: Colors.black,
@@ -31,36 +31,17 @@ class SignInScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 16),
-
-                  const Text(
+                  SizedBox(height: 16),
+                  Text(
                     "Sign in with your email and password  \nor continue with social media",
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
-
-                  const SizedBox(height: 16),
-                  const SignForm(),
-                  const SizedBox(height: 16),
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.center,
-                  //   children: [
-                  //     SocalCard(
-                  //       icon: "assets/icons/google-icon.svg",
-                  //       press: () {},
-                  //     ),
-                  //     SocalCard(
-                  //       icon: "assets/icons/facebook-2.svg",
-                  //       press: () {},
-                  //     ),
-                  //     SocalCard(
-                  //       icon: "assets/icons/twitter.svg",
-                  //       press: () {},
-                  //     ),
-                  //   ],
-                  // ),
-                  const SizedBox(height: 20),
-                  const NoAccountText(),
+                  SizedBox(height: 16),
+                  SizedBox(height: 16),
+                  SignForm(),
+                  SizedBox(height: 16),
+                  SizedBox(height: 20),
+                  NoAccountText(),
                 ],
               ),
             ),
