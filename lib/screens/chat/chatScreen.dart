@@ -29,7 +29,6 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   late Account _sendAccount;
   late Account _receiveAccount;
-  final List<ChatMessage> _messages = [];
   final TextEditingController _controller = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -83,7 +82,9 @@ class _ChatScreenState extends State<ChatScreen> {
       userEmail =
           _sendAccount.email; // Assuming sender's email is the user's email
 
-      _fetchMessages();
+      setState(() {
+        _isLoading = false;
+      });
     } catch (e) {
       setState(() {
         _hasError = true; // Set error state to true
@@ -92,41 +93,15 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> _fetchMessages() async {
-    final snapshot = await _firestore
-        .collection('chats')
-        .doc(emailMember)
-        .collection('messages')
-        .orderBy('timeSend')
-        .get();
-
-    final messages =
-        snapshot.docs.map((doc) => ChatMessage.fromMap(doc.data())).toList();
-
-    setState(() {
-      _messages.addAll(messages);
-      _isLoading = false;
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      SchedulerBinding.instance.addPostFrameCallback((_) async {
-        await _scrollController.animateTo(
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          duration: Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       });
-    });
-  }
-
-  void _scrollToBottom() {
-    if (_messages.isNotEmpty) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
     }
   }
 
@@ -149,11 +124,7 @@ class _ChatScreenState extends State<ChatScreen> {
       transaction.set(documentReference, message.toMap());
     });
 
-    setState(() {
-      _messages.add(message);
-      _controller.clear();
-    });
-
+    _controller.clear();
     _scrollToBottom();
   }
 
@@ -180,10 +151,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     FirebaseFirestore.instance.runTransaction((transaction) async {
       transaction.set(documentReference, message.toMap());
-    });
-
-    setState(() {
-      _messages.add(message);
     });
 
     _scrollToBottom(); // Scroll to bottom after sending image
@@ -220,64 +187,93 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: _isLoading
                 ? Center(child: CircularProgressIndicator())
-                : ListView.builder(
-                    controller: _scrollController, // Attach ScrollController
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final message = _messages[index];
-                      final isCurrentUser =
-                          message.emailSend == widget.emailSend;
+                : StreamBuilder<QuerySnapshot>(
+                    stream: _firestore
+                        .collection('chats')
+                        .doc(emailMember)
+                        .collection('messages')
+                        .orderBy('timeSend')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                      return Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: isCurrentUser
-                              ? MainAxisAlignment.end
-                              : MainAxisAlignment.start,
-                          children: [
-                            if (!isCurrentUser)
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage:
-                                    NetworkImage(_receiveAccount.profilePicUrl),
-                              ),
-                            SizedBox(width: 8),
-                            Column(
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(child: Text('No messages yet.'));
+                      }
+
+                      final messages = snapshot.data!.docs
+                          .map((doc) => ChatMessage.fromMap(
+                              doc.data() as Map<String, dynamic>))
+                          .toList();
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        _scrollToBottom();
+                      });
+
+                      return ListView.builder(
+                        controller: _scrollController,
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          final message = messages[index];
+                          final isCurrentUser =
+                              message.emailSend == widget.emailSend;
+
+                          return Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: isCurrentUser
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
                               children: [
-                                Container(
-                                  padding: EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: isCurrentUser
-                                        ? kPrimaryColor
-                                        : kSecondaryColor,
-                                    borderRadius: BorderRadius.circular(12),
+                                if (!isCurrentUser)
+                                  CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage: NetworkImage(
+                                        _receiveAccount.profilePicUrl),
                                   ),
-                                  child: message.type == 'text'
-                                      ? Text(message.text!,
-                                          style: TextStyle(color: Colors.white))
-                                      : Image.network(
-                                          message.imageUrl!,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.6, // 80% of screen width
-                                          fit: BoxFit
-                                              .contain, // Adjust the fit based on your image requirements
-                                        ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  DateFormat('HH:mm').format(message.timeSend),
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.grey),
+                                SizedBox(width: 8),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: isCurrentUser
+                                            ? kPrimaryColor
+                                            : kSecondaryColor,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: message.type == 'text'
+                                          ? Text(message.text!,
+                                              style: TextStyle(
+                                                  color: Colors.white))
+                                          : Image.network(
+                                              message.imageUrl!,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.6, // 80% of screen width
+                                              fit: BoxFit
+                                                  .contain, // Adjust the fit based on your image requirements
+                                            ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      DateFormat('HH:mm')
+                                          .format(message.timeSend),
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     },
                   ),
