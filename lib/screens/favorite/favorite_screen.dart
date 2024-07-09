@@ -47,14 +47,14 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           : Column(
               children: [
                 Text(
-                  "Favorites",
+                  "Our Selection",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: GridView.builder(
-                      itemCount: demoProducts.length,
+                      itemCount: legoList!.length,
                       gridDelegate:
                           const SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 200,

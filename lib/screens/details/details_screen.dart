@@ -104,8 +104,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _hasError
-          ? const Center(child: Text('Error fetching Lego details'))
           : ListView(
         children: [
           ProductImages(product: product!),

@@ -18,7 +18,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final LegoRequest request = LegoRequest();
-  List<Lego>? legoList;
+  List<Lego>? recentList;
+  List<Lego>? popularList;
   bool _isLoading = true;
 
   @override
@@ -29,9 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchLegoList() async {
     try {
-      final fetchedLegoList = await request.fetchLegoList();
+      final fetchedRecentList = await request.fetchRecentLegoList();
+      final fetchedPopularList = await request.fetchPopularLegoList();
       setState(() {
-        legoList = fetchedLegoList;
+        recentList = fetchedRecentList;
+        popularList = fetchedPopularList;
         _isLoading = false;
       });
     } catch (error) {
@@ -57,7 +60,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const Categories(),
                     const SpecialOffers(),
                     const SizedBox(height: 20),
-                    PopularProducts(legoList: legoList),
+                    PopularProducts(
+                        legoList: popularList, title: "Popular Products"),
+                    PopularProducts(
+                        legoList: recentList, title: "Recently Added"),
                     const SizedBox(height: 20),
                   ],
                 ),
