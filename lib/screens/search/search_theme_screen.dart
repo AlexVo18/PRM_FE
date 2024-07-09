@@ -1,34 +1,37 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/product_card.dart';
 import 'package:shop_app/models/Lego.dart';
+import 'package:shop_app/screens/details/details_screen.dart';
 import 'package:shop_app/services/legoRequest.dart';
 
-import '../../main.dart';
-import '../details/details_screen.dart';
+class SearchThemeScreen extends StatefulWidget {
+  static String routeName = "/searchThemedLego";
 
-class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key});
-
-  static String routeName = "/products";
+  const SearchThemeScreen({super.key});
 
   @override
-  _ProductsScreenState createState() => _ProductsScreenState();
+  _SearchThemeScreenState createState() => _SearchThemeScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> {
+class _SearchThemeScreenState extends State<SearchThemeScreen> {
   final LegoRequest request = LegoRequest();
   List<Lego>? legoList;
   bool _isLoading = true;
+  late String themeName;
 
   @override
-  void initState() {
-    super.initState();
-    _fetchLegoList();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final SearchThemeArguments args =
+        ModalRoute.of(context)!.settings.arguments as SearchThemeArguments;
+    themeName = args.themeName;
+    _fetchSearchList(args.themeid);
   }
 
-  Future<void> _fetchLegoList() async {
+  Future<void> _fetchSearchList(int themeid) async {
     try {
-      final fetchedLegoList = await request.fetchLegoList();
+      final fetchedLegoList = await request.fetchThemedLegoList(themeid);
       setState(() {
         legoList = fetchedLegoList;
         _isLoading = false;
@@ -42,7 +45,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Products"),
+        title: Text(themeName + " Legos"),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -71,4 +74,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ),
     );
   }
+}
+
+class SearchThemeArguments {
+  final int themeid;
+  final String themeName;
+
+  SearchThemeArguments({required this.themeName, required this.themeid});
 }

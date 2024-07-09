@@ -37,4 +37,64 @@ class LegoRequest {
       throw Exception('Failed to fetch lego detail');
     }
   }
+
+  Future<List<Lego>> fetchRecentLegoList() async {
+    final url = Uri.parse('$baseUrl/custom/getRecentLego');
+
+    final response = await http.get(url, headers: {'X-API-KEY': '$key'});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> legoList = data['data'];
+      print(legoList);
+      return legoList.map((json) => Lego.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch lego list');
+    }
+  }
+
+  Future<List<Lego>> fetchPopularLegoList() async {
+    final url = Uri.parse('$baseUrl/custom/getPopularLego');
+
+    final response = await http.get(url, headers: {'X-API-KEY': '$key'});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> legoList = data['data'];
+      print(legoList);
+      return legoList.map((json) => Lego.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch lego list');
+    }
+  }
+
+  Future<List<Lego>> fetchSearchList(String keyword) async {
+    final url = Uri.parse('$baseUrl/custom/searchLegoByName?name=$keyword');
+
+    final response = await http.get(url, headers: {'X-API-KEY': '$key'});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> legoList = data['data'];
+      print(legoList);
+      return legoList.map((json) => Lego.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch lego list');
+    }
+  }
+
+  Future<List<Lego>> fetchThemedLegoList(int themeid) async {
+    final url = Uri.parse('$baseUrl/custom/getLegoByThemeId?id=$themeid');
+
+    final response = await http.get(url, headers: {'X-API-KEY': '$key'});
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<dynamic> legoList = data['data'];
+      print(legoList);
+      return legoList.map((json) => Lego.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch lego list');
+    }
+  }
 }

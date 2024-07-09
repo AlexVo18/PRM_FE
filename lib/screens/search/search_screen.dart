@@ -1,34 +1,35 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/components/product_card.dart';
 import 'package:shop_app/models/Lego.dart';
+import 'package:shop_app/screens/details/details_screen.dart';
 import 'package:shop_app/services/legoRequest.dart';
 
-import '../../main.dart';
-import '../details/details_screen.dart';
+class SearchScreen extends StatefulWidget {
+  static String routeName = "/search";
 
-class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key});
-
-  static String routeName = "/products";
+  const SearchScreen({super.key});
 
   @override
-  _ProductsScreenState createState() => _ProductsScreenState();
+  _SearchScreenState createState() => _SearchScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> {
+class _SearchScreenState extends State<SearchScreen> {
   final LegoRequest request = LegoRequest();
   List<Lego>? legoList;
   bool _isLoading = true;
 
   @override
-  void initState() {
-    super.initState();
-    _fetchLegoList();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final SearchArguments args =
+        ModalRoute.of(context)!.settings.arguments as SearchArguments;
+    _fetchSearchList(args.keyword);
   }
 
-  Future<void> _fetchLegoList() async {
+  Future<void> _fetchSearchList(String keyword) async {
     try {
-      final fetchedLegoList = await request.fetchLegoList();
+      final fetchedLegoList = await request.fetchSearchList(keyword);
       setState(() {
         legoList = fetchedLegoList;
         _isLoading = false;
@@ -71,4 +72,10 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ),
     );
   }
+}
+
+class SearchArguments {
+  final String keyword;
+
+  SearchArguments({required this.keyword});
 }

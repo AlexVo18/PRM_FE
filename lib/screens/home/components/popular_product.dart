@@ -6,9 +6,11 @@ import '../../products/products_screen.dart';
 import 'section_title.dart';
 
 class PopularProducts extends StatelessWidget {
-  const PopularProducts({super.key, required this.legoList});
+  const PopularProducts(
+      {super.key, required this.legoList, required this.title});
 
   final List<Lego>? legoList;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,7 @@ class PopularProducts extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SectionTitle(
-            title: "Popular Products",
+            title: title,
             press: () {
               Navigator.pushNamed(context, ProductsScreen.routeName);
             },
