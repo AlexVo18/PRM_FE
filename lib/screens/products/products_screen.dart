@@ -3,6 +3,7 @@ import 'package:shop_app/components/product_card.dart';
 import 'package:shop_app/models/Lego.dart';
 import 'package:shop_app/services/legoRequest.dart';
 
+import '../../main.dart';
 import '../details/details_screen.dart';
 
 class ProductsScreen extends StatefulWidget {

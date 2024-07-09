@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../models/Cart.dart';
 import 'components/cart_card.dart';
 import 'components/check_out_card.dart';
+import '../cart/components/state_management.dart';
 
 class CartScreen extends StatefulWidget {
   static String routeName = "/cart";
@@ -15,6 +16,13 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  void _clearCart() {
+    setState(() {
+      demoCarts.clear();
+      cartItemCount.value = demoCarts.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,9 +33,12 @@ class _CartScreenState extends State<CartScreen> {
               "Your Cart",
               style: TextStyle(color: Colors.black),
             ),
-            Text(
-              "${demoCarts.length} items",
-              style: Theme.of(context).textTheme.bodySmall,
+            ValueListenableBuilder<int>(
+              valueListenable: cartItemCount,
+              builder: (context, itemCount, _) => Text(
+                "$itemCount items",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ),
           ],
         ),
@@ -39,11 +50,12 @@ class _CartScreenState extends State<CartScreen> {
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Dismissible(
-              key: Key(demoCarts[index].product.id.toString()),
+              key: Key(demoCarts[index].lego.id.toString()),
               direction: DismissDirection.endToStart,
               onDismissed: (direction) {
                 setState(() {
                   demoCarts.removeAt(index);
+                  cartItemCount.value = demoCarts.length;
                 });
               },
               background: Container(
@@ -64,7 +76,13 @@ class _CartScreenState extends State<CartScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const CheckoutCard(),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CheckoutCard(myCart: demoCarts, onClearCart: _clearCart),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }

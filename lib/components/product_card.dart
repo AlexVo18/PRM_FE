@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_app/constants/constants.dart';
 import 'package:shop_app/models/Lego.dart';
-
-import '../models/Product.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({

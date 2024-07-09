@@ -13,6 +13,8 @@ class CartCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lego = cart.lego;
+
     return Row(
       children: [
         SizedBox(
@@ -25,7 +27,14 @@ class CartCard extends StatelessWidget {
                 color: const Color(0xFFF5F6F9),
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: Image.asset(cart.product.images[0]),
+              child: lego.image.isNotEmpty
+                  ? Image.network(
+                      lego.image[0],
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.error),
+                    )
+                  : const SizedBox(),
             ),
           ),
         ),
@@ -34,14 +43,14 @@ class CartCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              cart.product.title,
+              lego.name,
               style: const TextStyle(color: Colors.black, fontSize: 16),
               maxLines: 2,
             ),
             const SizedBox(height: 8),
             Text.rich(
               TextSpan(
-                text: "\$${cart.product.price}",
+                text: "\$${lego.price}",
                 style: const TextStyle(
                     fontWeight: FontWeight.w600, color: kPrimaryColor),
                 children: [

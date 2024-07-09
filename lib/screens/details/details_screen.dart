@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shop_app/constants/constants.dart';
 import 'package:shop_app/models/LegoDetail.dart';
 import 'package:shop_app/screens/cart/cart_screen.dart';
 import 'package:shop_app/services/legoRequest.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
+import '../../models/Cart.dart';
 import 'components/product_description.dart';
 import 'components/product_images.dart';
 import 'components/top_rounded_container.dart';
+import '../cart/components/state_management.dart';
 
 class DetailsScreen extends StatefulWidget {
   static String routeName = "/details";
 
-  const DetailsScreen({super.key});
+  const DetailsScreen({
+    super.key,
+  });
 
   @override
   _DetailsScreenState createState() => _DetailsScreenState();
@@ -25,7 +31,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final ProductDetailsArguments args = ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
+    final ProductDetailsArguments args =
+        ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
     _fetchLegoDetail(args.id);
   }
 
@@ -43,6 +50,52 @@ class _DetailsScreenState extends State<DetailsScreen> {
       });
       print('Error fetching Lego detail: $error');
     }
+  }
+
+  void _addToCart(LegoDetail lego) {
+    print('Lego: ${lego.name}');
+    setState(() {
+      bool itemExists = false;
+      for (var cartItem in demoCarts) {
+        if (cartItem.lego.id == lego.id) {
+          cartItem.numOfItem += 1;
+          itemExists = true;
+          break;
+        }
+      }
+      if (!itemExists) {
+        demoCarts.add(Cart(lego: lego, numOfItem: 1));
+      }
+
+      cartItemCount.value = demoCarts.length;
+    });
+
+    //Navigator.pushNamed(context, CartScreen.routeName);
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.rightSlide,
+      title: 'Item Added to Cart',
+      desc:
+          'The LEGO set has been successfully added to your cart. Continue shopping or proceed to checkout.',
+      showCloseIcon: true,
+      btnCancel: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: kSecondaryColor,
+        ),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text('Continue'),
+      ),
+      btnOk: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+          Navigator.pushNamed(context, CartScreen.routeName);
+        },
+        child: const Text('Your cart'),
+      ),
+    ).show();
   }
 
   @override
@@ -78,7 +131,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
             children: [
               Container(
                 margin: const EdgeInsets.only(right: 20),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
@@ -105,23 +159,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _hasError
-          ? const Center(child: Text('Error fetching Lego details'))
-          : ListView(
-        children: [
-          ProductImages(product: product!),
-          TopRoundedContainer(
-            color: Colors.white,
-            child: Column(
-              children: [
-                ProductDescription(
-                  product: product!,
-                  pressOnSeeMore: () {},
+              ? const Center(child: Text('Error fetching Lego details'))
+              : ListView(
+                  children: [
+                    ProductImages(product: product!),
+                    TopRoundedContainer(
+                      color: Colors.white,
+                      child: Column(
+                        children: [
+                          ProductDescription(
+                            product: product!,
+                            pressOnSeeMore: () {},
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
       bottomNavigationBar: TopRoundedContainer(
         color: Colors.white,
         child: SafeArea(
@@ -129,7 +183,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, CartScreen.routeName);
+                if (product != null) {
+                  _addToCart(product!);
+                }
               },
               child: const Text("Add To Cart"),
             ),
