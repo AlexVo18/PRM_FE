@@ -106,6 +106,9 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _sendMessage(String text) async {
+    if (text.trim().isEmpty) {
+      return; // Exit early if the message text is empty or contains only whitespace
+    }
     final message = ChatMessage(
       emailSend: widget.emailSend,
       emailReceive: widget.emailReceive,
@@ -179,14 +182,28 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat with ${widget.emailReceive}'),
-      ),
+      appBar: widget.emailSend == staffEmail
+          ? AppBar(
+              title: Text('Chat with ${widget.emailReceive}'),
+            )
+          : null,
       body: Column(
         children: [
+          if (widget.emailSend != staffEmail)
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Chat with Store',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           Expanded(
             child: _isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : StreamBuilder<QuerySnapshot>(
                     stream: _firestore
                         .collection('chats')
@@ -196,11 +213,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
 
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return Center(child: Text('No messages yet.'));
+                        return const Center(child: Text('No messages yet.'));
                       }
 
                       final messages = snapshot.data!.docs
@@ -221,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               message.emailSend == widget.emailSend;
 
                           return Padding(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +252,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     backgroundImage: NetworkImage(
                                         _receiveAccount.profilePicUrl),
                                   ),
-                                SizedBox(width: 8),
+                                SizedBox(width: 6),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
