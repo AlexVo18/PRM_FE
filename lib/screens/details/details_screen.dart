@@ -46,7 +46,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     } catch (error) {
       setState(() {
         _hasError = true;
-        _isLoading = false; 
+        _isLoading = false;
       });
       print('Error fetching Lego detail: $error');
     }
@@ -56,7 +56,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     print('Lego: ${lego.name}');
     setState(() {
       bool itemExists = false;
-      for (var cartItem in demoCarts) {
+      for (var cartItem in myCart) {
         if (cartItem.lego.id == lego.id) {
           cartItem.numOfItem += 1;
           itemExists = true;
@@ -64,10 +64,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
         }
       }
       if (!itemExists) {
-        demoCarts.add(Cart(lego: lego, numOfItem: 1));
+        myCart.add(Cart(lego: lego, numOfItem: 1));
       }
 
-      cartItemCount.value = demoCarts.length;
+      cartItemCount.value = myCart.length;
     });
 
     //Navigator.pushNamed(context, CartScreen.routeName);

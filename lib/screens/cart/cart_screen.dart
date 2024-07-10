@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 import '../../models/Cart.dart';
 import 'components/cart_card.dart';
@@ -17,10 +18,35 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   void _clearCart() {
-    setState(() {
-      demoCarts.clear();
-      cartItemCount.value = demoCarts.length;
-    });
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.warning,
+      animType: AnimType.rightSlide,
+      title: 'Clear Cart',
+      desc: 'Are you sure you want to clear all items from the cart?',
+      btnCancel: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.grey,
+        ),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text('Cancel'),
+      ),
+      btnOk: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+        ),
+        onPressed: () {
+          Navigator.of(context).pop();
+          setState(() {
+            myCart.clear();
+            cartItemCount.value = myCart.length;
+          });
+        },
+        child: const Text('Ok'),
+      ),
+    ).show();
   }
 
   @override
@@ -46,16 +72,16 @@ class _CartScreenState extends State<CartScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: ListView.builder(
-          itemCount: demoCarts.length,
+          itemCount: myCart.length,
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Dismissible(
-              key: Key(demoCarts[index].lego.id.toString()),
+              key: Key(myCart[index].lego.id.toString()),
               direction: DismissDirection.endToStart,
               onDismissed: (direction) {
                 setState(() {
-                  demoCarts.removeAt(index);
-                  cartItemCount.value = demoCarts.length;
+                  myCart.removeAt(index);
+                  cartItemCount.value = myCart.length;
                 });
               },
               background: Container(
@@ -71,7 +97,7 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
               ),
-              child: CartCard(cart: demoCarts[index]),
+              child: CartCard(cart: myCart[index]),
             ),
           ),
         ),
@@ -79,7 +105,7 @@ class _CartScreenState extends State<CartScreen> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          CheckoutCard(myCart: demoCarts, onClearCart: _clearCart),
+          CheckoutCard(myCart: myCart, onClearCart: _clearCart),
           const SizedBox(height: 16),
         ],
       ),

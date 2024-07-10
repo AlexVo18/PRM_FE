@@ -7,4 +7,4 @@ class Cart {
   Cart({required this.lego, required this.numOfItem});
 }
 
-List<Cart> demoCarts = [];
+List<Cart> myCart = [];

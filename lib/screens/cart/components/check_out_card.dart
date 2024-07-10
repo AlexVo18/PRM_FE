@@ -89,13 +89,14 @@ class CheckoutCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 16),
-                IconButton(
-                  onPressed: onClearCart,
-                  icon: const Icon(
-                    Icons.delete,
-                    color: Colors.red,
+                if (myCart.isNotEmpty) // Condition to display the trash button
+                  IconButton(
+                    onPressed: onClearCart,
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
                   ),
-                ),
               ],
             ),
           ],
