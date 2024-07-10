@@ -56,6 +56,7 @@ class _InitScreenState extends State<InitScreen> {
                   '', // Replace with the actual sender's email
             ),
       const ProfileScreen(),
+      const MapScreen(),
     ];
 
     return Scaffold(
