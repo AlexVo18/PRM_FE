@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop_app/provider/CartProvider.dart';
 import 'package:shop_app/screens/search/search_screen.dart';
 
 import '../../cart/cart_screen.dart';
 import 'icon_btn_with_counter.dart';
 import 'search_field.dart';
-import '../../cart/components/state_management.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
@@ -29,7 +30,7 @@ class HomeHeader extends StatelessWidget {
           )),
           const SizedBox(width: 16),
           ValueListenableBuilder<int>(
-            valueListenable: cartItemCount,
+            valueListenable: Provider.of<CartProvider>(context).cartItemCount,
             builder: (context, count, child) {
               return IconBtnWithCounter(
                 svgSrc: "assets/icons/Cart Icon.svg",

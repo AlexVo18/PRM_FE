@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/provider/CartProvider.dart';
 import 'package:shop_app/screens/splash/splash_screen.dart';
 import 'package:shop_app/utils/preUtils.dart';
 import 'package:shop_app/utils/utils.dart';
@@ -22,7 +24,13 @@ Future<void> main() async {
   );
   PrefUtil.init();
 
-  runApp(MyApp());
+  //runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => CartProvider()..loadCart(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

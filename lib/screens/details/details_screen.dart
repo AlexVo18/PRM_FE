@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/constants/constants.dart';
 import 'package:shop_app/models/LegoDetail.dart';
+import 'package:shop_app/provider/CartProvider.dart';
 import 'package:shop_app/screens/cart/cart_screen.dart';
 import 'package:shop_app/services/legoRequest.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 
-import '../../models/Cart.dart';
 import 'components/product_description.dart';
 import 'components/product_images.dart';
 import 'components/top_rounded_container.dart';
-import '../cart/components/state_management.dart';
 
 class DetailsScreen extends StatefulWidget {
   static String routeName = "/details";
@@ -52,25 +53,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
   }
 
+  Future<void> _loadCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      //_counter = prefs.getInt('counter') ?? 0;
+    });
+  }
+
   void _addToCart(LegoDetail lego) {
     print('Lego: ${lego.name}');
-    setState(() {
-      bool itemExists = false;
-      for (var cartItem in myCart) {
-        if (cartItem.lego.id == lego.id) {
-          cartItem.numOfItem += 1;
-          itemExists = true;
-          break;
-        }
-      }
-      if (!itemExists) {
-        myCart.add(Cart(lego: lego, numOfItem: 1));
-      }
+    Provider.of<CartProvider>(context, listen: false).addToCart(lego);
 
-      cartItemCount.value = myCart.length;
-    });
-
-    //Navigator.pushNamed(context, CartScreen.routeName);
     AwesomeDialog(
       context: context,
       dialogType: DialogType.success,

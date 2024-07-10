@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/models/Account.dart';
+import 'package:shop_app/models/Cart.dart';
 
 class PrefUtil {
   static late final SharedPreferences preferences;
@@ -47,5 +48,24 @@ class PrefUtil {
 
     final Map<String, dynamic> json = jsonDecode(jsonStr);
     return Account.fromJson(json);
+  }
+
+  static void saveCartForCurrentUser(List<Cart> cart) {
+    final currentUser = getCurrentUser();
+    if (currentUser != null) {
+      setValue('cart_${currentUser.email}',
+          jsonEncode(cart.map((item) => item.toJson()).toList()));
+      print('Cart saved');
+    }
+  }
+
+  static List<Cart> getCartForCurrentUser() {
+    final currentUser = getCurrentUser();
+    if (currentUser != null) {
+      final jsonStr = getValue('cart_${currentUser.email}', '[]') as String;
+      final List<dynamic> json = jsonDecode(jsonStr);
+      return json.map((item) => Cart.fromJson(item)).toList();
+    }
+    return [];
   }
 }

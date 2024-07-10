@@ -1,9 +1,11 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/models/Cart.dart';
 
 class Account {
   final String email, displayName, address, phoneNumber, profilePicUrl;
+  final List<Cart> cart;
 
   Account({
     required this.email,
@@ -11,6 +13,7 @@ class Account {
     required this.address,
     required this.phoneNumber,
     required this.profilePicUrl,
+    required this.cart,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,12 +36,15 @@ class Account {
   }
 
   factory Account.fromJson(Map<String, dynamic> json) {
+    final List<dynamic>? cartJson = json['cart'] ?? [];
+
     return Account(
       email: json['Email'] ?? '',
       displayName: json['DisplayName'] ?? '',
       address: json['Address'] ?? '',
       phoneNumber: json['PhoneNumber'] ?? '',
       profilePicUrl: json['ProfilePicUrl'] ?? '',
+      cart: cartJson!.map((item) => Cart.fromJson(item)).toList(),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/services/AccountRequest.dart';
+import 'package:shop_app/utils/preUtils.dart';
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
 import '../../../constants/constants.dart';
@@ -186,6 +187,7 @@ class _ProfileUpdateFormState extends State<ProfileUpdateForm> {
                                 address: address!,
                                 phoneNumber: phoneNumber!,
                                 profilePicUrl: _account!.profilePicUrl,
+                                cart: PrefUtil.getCartForCurrentUser(),
                               );
                               await accountRequest.updateAccount(newAccount);
                               Account.saveUser(newAccount);

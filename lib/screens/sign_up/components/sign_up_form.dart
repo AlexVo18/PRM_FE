@@ -246,12 +246,14 @@ class _SignUpFormState extends State<SignUpForm> {
                   );
                   //add to db
                   final registerUser = Account(
-                      email: email!,
-                      displayName: name!,
-                      address: address!,
-                      phoneNumber: phoneNumber!,
-                      profilePicUrl:
-                          "https://firebasestorage.googleapis.com/v0/b/legoandroidapp-426102.appspot.com/o/Profile%20Image.png?alt=media&token=6e00421c-ad7a-4195-9792-c772e9a052c1");
+                    email: email!,
+                    displayName: name!,
+                    address: address!,
+                    phoneNumber: phoneNumber!,
+                    profilePicUrl:
+                        "https://firebasestorage.googleapis.com/v0/b/legoandroidapp-426102.appspot.com/o/Profile%20Image.png?alt=media&token=6e00421c-ad7a-4195-9792-c772e9a052c1",
+                    cart: [],
+                  );
 
                   final accountRequest = AccountRequest();
 

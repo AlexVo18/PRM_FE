@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:shop_app/provider/CartProvider.dart';
 
 import '../../models/Cart.dart';
 import 'components/cart_card.dart';
 import 'components/check_out_card.dart';
-import '../cart/components/state_management.dart';
 
 class CartScreen extends StatefulWidget {
   static String routeName = "/cart";
@@ -39,18 +40,32 @@ class _CartScreenState extends State<CartScreen> {
         ),
         onPressed: () {
           Navigator.of(context).pop();
-          setState(() {
-            myCart.clear();
-            cartItemCount.value = myCart.length;
-          });
+          Provider.of<CartProvider>(context, listen: false).clearCart();
         },
         child: const Text('Ok'),
       ),
     ).show();
   }
 
+  void _incrementQuantity(int index) {
+    Provider.of<CartProvider>(context, listen: false).incrementQuantity(index);
+  }
+
+  void _decrementQuantity(int index) {
+    Provider.of<CartProvider>(context, listen: false).decrementQuantity(index);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<CartProvider>(context, listen: false).loadCart();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context);
+    final List<Cart> myCart = cartProvider.cart;
+
     return Scaffold(
       appBar: AppBar(
         title: Column(
@@ -60,7 +75,7 @@ class _CartScreenState extends State<CartScreen> {
               style: TextStyle(color: Colors.black),
             ),
             ValueListenableBuilder<int>(
-              valueListenable: cartItemCount,
+              valueListenable: cartProvider.cartItemCount,
               builder: (context, itemCount, _) => Text(
                 "$itemCount items",
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -79,10 +94,8 @@ class _CartScreenState extends State<CartScreen> {
               key: Key(myCart[index].lego.id.toString()),
               direction: DismissDirection.endToStart,
               onDismissed: (direction) {
-                setState(() {
-                  myCart.removeAt(index);
-                  cartItemCount.value = myCart.length;
-                });
+                Provider.of<CartProvider>(context, listen: false)
+                    .removeFromCart(index);
               },
               background: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -97,7 +110,11 @@ class _CartScreenState extends State<CartScreen> {
                   ],
                 ),
               ),
-              child: CartCard(cart: myCart[index]),
+              child: CartCard(
+                cart: myCart[index],
+                onIncrement: () => _incrementQuantity(index),
+                onDecrement: () => _decrementQuantity(index),
+              ),
             ),
           ),
         ),

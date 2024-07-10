@@ -32,4 +32,17 @@ class LegoDetail {
         themes: List<Theme>.from(
             json['themes'].map((theme) => Theme.fromJson(theme))));
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'price': price,
+      'image': image,
+      'description': description,
+      'releaseYear': releaseYear,
+      'number': number,
+      'themes': themes.map((theme) => theme.toJson()).toList(),
+    };
+  }
 }

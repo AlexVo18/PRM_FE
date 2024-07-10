@@ -19,6 +19,8 @@ class CheckoutCard extends StatelessWidget {
       totalPrice += cart.lego.price * cart.numOfItem;
     }
 
+    String formattedTotalPrice = totalPrice.toStringAsFixed(2);
+
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 16,
@@ -74,7 +76,7 @@ class CheckoutCard extends StatelessWidget {
                       text: "Total:\n",
                       children: [
                         TextSpan(
-                          text: "\$$totalPrice",
+                          text: "\$$formattedTotalPrice",
                           style: const TextStyle(
                               fontSize: 16, color: Colors.black),
                         ),
