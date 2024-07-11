@@ -41,6 +41,11 @@ class _SignFormState extends State<SignForm> {
     }
   }
 
+  Future<void> saveEmailToPreferences(String email) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userEmail', email);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -136,11 +141,10 @@ class _SignFormState extends State<SignForm> {
                   KeyboardUtil.hideKeyboard(context);
                   //save to storage
 
+                  await saveEmailToPreferences(email!);
+
                   final accountRequest = AccountRequest();
-
-                  Account account =
-                      await accountRequest.getAccountDetail(email!);
-
+                  Account account = await accountRequest.getAccountDetail(email!);
                   if (account != null) {
                     Account.saveUser(account);
                   }

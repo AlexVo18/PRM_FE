@@ -15,6 +15,7 @@ import 'theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 Future<void> main() async {
   // Initialize Firebase asynchronously before creating the MaterialApp widget
@@ -23,6 +24,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   PrefUtil.init();
+  Stripe.publishableKey = "pk_test_51PbO7LRpGRSEJtbQNNaAI6fymKKfuVzN2d7xeqvEpkqf9UEgg3STuNYp1ttFOLLDoZdmDg5tpCTyo2sEfr0YviLp00XrtkKiAU";
+  await Stripe.instance.applySettings();
 
   //runApp(MyApp());
   runApp(
