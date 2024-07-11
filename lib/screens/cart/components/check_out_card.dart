@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shop_app/models/Cart.dart';
+import 'package:shop_app/provider/CartProvider.dart';
 
 class CheckoutCard extends StatelessWidget {
   const CheckoutCard({
@@ -10,6 +12,45 @@ class CheckoutCard extends StatelessWidget {
 
   final List<Cart> myCart;
   final VoidCallback onClearCart;
+
+  void _showCartDialog(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Cart Contents"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: myCart.map((cart) {
+                return ListTile(
+                  title: Text(cart.lego.name),
+                  subtitle: Text("Quantity: ${cart.numOfItem}"),
+                  trailing: Text("\$${(cart.lego.price * cart.numOfItem).toStringAsFixed(2)}"),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Close"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                // Save to billing and billing detail
+                //await cartProvider.saveToBilling("account@example.com");
+                Navigator.of(context).pop();
+              },
+              child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,28 +86,6 @@ class CheckoutCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row(
-            //   children: [
-            //     Container(
-            //       padding: const EdgeInsets.all(10),
-            //       height: 40,
-            //       width: 40,
-            //       decoration: BoxDecoration(
-            //         color: const Color(0xFFF5F6F9),
-            //         borderRadius: BorderRadius.circular(10),
-            //       ),
-            //       child: SvgPicture.asset("assets/icons/receipt.svg"),
-            //     ),
-            //     const Spacer(),
-            //     const Text("Add voucher code"),
-            //     const SizedBox(width: 8),
-            //     const Icon(
-            //       Icons.arrow_forward_ios,
-            //       size: 12,
-            //       color: kTextColor,
-            //     )
-            //   ],
-            // ),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -86,7 +105,7 @@ class CheckoutCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => _showCartDialog(context),
                     child: const Text("Check Out"),
                   ),
                 ),

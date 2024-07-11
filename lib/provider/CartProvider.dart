@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/models/Cart.dart';
 import 'package:shop_app/models/LegoDetail.dart';
+import 'package:shop_app/models/Billing.dart';
+import 'package:shop_app/models/BillingDetail.dart';
 import 'package:shop_app/utils/preUtils.dart';
 
 class CartProvider with ChangeNotifier {
@@ -69,5 +71,36 @@ class CartProvider with ChangeNotifier {
     cartItemCount.value = _cart.length;
     PrefUtil.saveCartForCurrentUser(_cart);
     notifyListeners();
+  }
+
+  Future<void> saveToBilling(String accountEmail) async {
+    double totalPrice = 0;
+    for (var cart in _cart) {
+      totalPrice += cart.lego.price * cart.numOfItem;
+    }
+
+    final billing = Billing(
+      accountEmail: accountEmail,
+      dateCreated: DateTime.now(),
+      datePaid: DateTime.now(),
+      id: DateTime.now().millisecondsSinceEpoch, // Generate a unique ID
+      status: 1, // Status example
+      totalPrice: totalPrice,
+    );
+
+    await Billing.saveBilling(billing);
+
+    for (var cart in _cart) {
+      final billingDetail = BillingDetail(
+        billingId: billing.id,
+        id: DateTime.now().millisecondsSinceEpoch + cart.lego.id,
+        legoId: cart.lego.id,
+        quantity: cart.numOfItem,
+      );
+
+      await BillingDetail.saveBillingDetail(billingDetail);
+    }
+
+    clearCart();
   }
 }
