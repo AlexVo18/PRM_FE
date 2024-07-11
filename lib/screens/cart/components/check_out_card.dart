@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/models/Cart.dart';
+import 'package:shop_app/models/Billing.dart';
+import 'package:shop_app/models/BillingDetail.dart';
 import 'package:shop_app/provider/CartProvider.dart';
 
 class CheckoutCard extends StatelessWidget {
@@ -41,10 +43,51 @@ class CheckoutCard extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 // Save to billing and billing detail
-                //await cartProvider.saveToBilling("account@example.com");
+                final result = await cartProvider.saveToBilling("account@example.com");
+                final Billing billing = result['billing'];
+                final List<BillingDetail> billingDetails = result['billingDetails'];
                 Navigator.of(context).pop();
+                _showBillingDialog(context, billing, billingDetails);
               },
               child: const Text("Confirm"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showBillingDialog(BuildContext context, Billing billing, List<BillingDetail> billingDetails) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Billing Details"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Account email: ${billing.accountEmail}"),
+                Text("Billing ID: ${billing.id}"),
+                Text("Total Price: \$${billing.totalPrice.toStringAsFixed(2)}"),
+                Text("Status: ${billing.status}"),
+                const SizedBox(height: 16),
+                const Text("Billing Details:"),
+                ...billingDetails.map((detail) {
+                  return ListTile(
+                    title: Text("Lego ID: ${detail.legoId}"),
+                    subtitle: Text("Quantity: ${detail.quantity}"),
+                  );
+                }).toList(),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Close"),
             ),
           ],
         );

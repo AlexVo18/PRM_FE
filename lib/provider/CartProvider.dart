@@ -73,7 +73,7 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> saveToBilling(String accountEmail) async {
+  Future<Map<String, dynamic>> saveToBilling(String accountEmail) async {
     double totalPrice = 0;
     for (var cart in _cart) {
       totalPrice += cart.lego.price * cart.numOfItem;
@@ -90,6 +90,7 @@ class CartProvider with ChangeNotifier {
 
     await Billing.saveBilling(billing);
 
+    List<BillingDetail> billingDetails = [];
     for (var cart in _cart) {
       final billingDetail = BillingDetail(
         billingId: billing.id,
@@ -99,8 +100,11 @@ class CartProvider with ChangeNotifier {
       );
 
       await BillingDetail.saveBillingDetail(billingDetail);
+      billingDetails.add(billingDetail);
     }
 
     clearCart();
+
+    return {'billing': billing, 'billingDetails': billingDetails};
   }
 }
