@@ -24,16 +24,14 @@ class CheckoutCard extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Cart Contents"),
+          title: const Text("Confirm check out !"),
           content: SingleChildScrollView(
-            child: ListBody(
-              children: myCart.map((cart) {
-                return ListTile(
-                  title: Text(cart.lego.name),
-                  subtitle: Text("Quantity: ${cart.numOfItem}"),
-                  trailing: Text("\$${(cart.lego.price * cart.numOfItem).toStringAsFixed(2)}"),
-                );
-              }).toList(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Add any additional content you need here
+                Text("Are you sure you want to proceed with the checkout?"),
+              ],
             ),
           ),
           actions: [
@@ -45,7 +43,6 @@ class CheckoutCard extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                // Save to billing and billing detail
                 SharedPreferences prefs = await SharedPreferences.getInstance();
                 String? email = prefs.getString('userEmail');
                 dynamic result;
@@ -57,7 +54,8 @@ class CheckoutCard extends StatelessWidget {
                 final Billing billing = result['billing'];
                 final List<BillingDetail> billingDetails = result['billingDetails'];
                 Navigator.of(context).pop();
-                _showBillingDialog(context, billing, billingDetails);
+                initPaymentSheet(context, billing.accountEmail, billing, billingDetails);
+                // _showBillingDialog(context, billing, billingDetails);
               },
               child: const Text("Confirm"),
             ),
@@ -95,31 +93,7 @@ class CheckoutCard extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () async {
-                initPaymentSheet(context, billing.accountEmail, billing);
-                try {
-                  await Stripe.instance.presentPaymentSheet();
-
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                      "Payment Done",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.green,
-                  ));
-
-                  // setState(() {
-                  //   bool hasDonated = true;
-                  // });
-                } catch (e) {
-                  print(e);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                      "Payment Failed",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.redAccent,
-                  ));
-                }
+                // initPaymentSheet(context, billing.accountEmail, billing);
               },
               child: const Text("Close"),
             ),
@@ -131,7 +105,7 @@ class CheckoutCard extends StatelessWidget {
 
   final String selectedCurrency = 'USD';
 
-  Future<void> initPaymentSheet(BuildContext context, String email, Billing billing) async {
+  Future<void> initPaymentSheet(BuildContext context, String email, Billing billing, List<BillingDetail> billingDetails) async {
     try {
       final data = await createPaymentIntent(
         totalAmount: billing.totalPrice.toString(),
@@ -139,28 +113,13 @@ class CheckoutCard extends StatelessWidget {
         currency: selectedCurrency,
       );
 
-
-
-      // if (data != null) {
-      //   await Stripe.instance.initPaymentSheet(
-      //     paymentSheetParameters: SetupPaymentSheetParameters(
-      //       merchantDisplayName: 'Lego Company (Group 3 division)',
-      //       paymentIntentClientSecret: data['client_secret'],
-      //       customerEphemeralKeySecret: data['ephemeralKey'],
-      //       customerId: data['id'],
-      //       style: ThemeMode.dark,
-      //     ),
-      //   );
-      // } else {
-      //   throw Exception('Incomplete or null data returned from createPaymentIntent');
-      // }
       if (data != null) {
         var gpay = const PaymentSheetGooglePay(
           merchantCountryCode: "US",
           currencyCode: "USD",
           testEnv: true,
         );
-        Stripe.instance.initPaymentSheet(
+        await Stripe.instance.initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
               paymentIntentClientSecret: data['client_secret'],
               style: ThemeMode.dark,
@@ -169,6 +128,8 @@ class CheckoutCard extends StatelessWidget {
             )
         );
       }
+
+      displayPaymentSheet(context);
 
     } catch (e) {
       print('Payment sheet failed: $e');
@@ -179,7 +140,33 @@ class CheckoutCard extends StatelessWidget {
     }
   }
 
+  void displayPaymentSheet(BuildContext context) async {
+    try {
+      await Stripe.instance.presentPaymentSheet();
 
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          "Payment Done",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
+      ));
+
+      // setState(() {
+      //   bool hasDonated = true;
+      // });
+    } catch (e) {
+      print(e);
+      print("Failed");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+          "Payment Failed",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.redAccent,
+      ));
+    }
+  }
 
 
   @override
