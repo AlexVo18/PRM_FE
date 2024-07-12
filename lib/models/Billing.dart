@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 class Billing {
   final String accountEmail;
@@ -19,10 +20,11 @@ class Billing {
   });
 
   Map<String, dynamic> toMap() {
+    final DateFormat formatter = DateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     return {
       'AccountEmail': accountEmail,
-      'DateCreated': dateCreated.toIso8601String(),
-      'DatePaid': datePaid.toIso8601String(),
+      'DateCreated': formatter.format(dateCreated),
+      'DatePaid': formatter.format(datePaid),
       'Id': id,
       'Status': status,
       'TotalPrice': totalPrice,

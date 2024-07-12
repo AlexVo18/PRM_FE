@@ -7,6 +7,7 @@ import 'package:shop_app/models/BillingDetail.dart';
 import 'package:shop_app/payment.dart';
 import 'package:shop_app/provider/CartProvider.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:shop_app/services/BillingRequest.dart';
 
 class CheckoutCard extends StatelessWidget {
   const CheckoutCard({
@@ -55,47 +56,8 @@ class CheckoutCard extends StatelessWidget {
                 final List<BillingDetail> billingDetails = result['billingDetails'];
                 Navigator.of(context).pop();
                 initPaymentSheet(context, billing.accountEmail, billing, billingDetails);
-                // _showBillingDialog(context, billing, billingDetails);
               },
               child: const Text("Confirm"),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showBillingDialog(BuildContext context, Billing billing, List<BillingDetail> billingDetails) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Billing Details"),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Account email: ${billing.accountEmail}"),
-                Text("Billing ID: ${billing.id}"),
-                Text("Total Price: \$${billing.totalPrice.toStringAsFixed(2)}"),
-                Text("Status: ${billing.status}"),
-                const SizedBox(height: 16),
-                const Text("Billing Details:"),
-                ...billingDetails.map((detail) {
-                  return ListTile(
-                    title: Text("Lego ID: ${detail.legoId}"),
-                    subtitle: Text("Quantity: ${detail.quantity}"),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                // initPaymentSheet(context, billing.accountEmail, billing);
-              },
-              child: const Text("Close"),
             ),
           ],
         );
@@ -129,7 +91,7 @@ class CheckoutCard extends StatelessWidget {
         );
       }
 
-      displayPaymentSheet(context);
+      displayPaymentSheet(context, email, billing, billingDetails);
 
     } catch (e) {
       print('Payment sheet failed: $e');
@@ -140,32 +102,41 @@ class CheckoutCard extends StatelessWidget {
     }
   }
 
-  void displayPaymentSheet(BuildContext context) async {
+  void displayPaymentSheet(BuildContext context, String email, Billing billing, List<BillingDetail> billingDetails) async {
     try {
       await Stripe.instance.presentPaymentSheet();
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          "Payment Done",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.green,
-      ));
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //   content: Text(
+      //     "Payment Done",
+      //     style: TextStyle(color: Colors.white),
+      //   ),
+      //   backgroundColor: Colors.green,
+      // ));
 
-      // setState(() {
-      //   bool hasDonated = true;
-      // });
+      addBillingData(context, billing, billingDetails);
+
     } catch (e) {
-      print(e);
-      print("Failed");
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(
-          "Payment Failed",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.redAccent,
-      ));
+      print("Error + $e");
+      print("Failed ABC");
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //   content: Text(
+      //     "Payment Failed",
+      //     style: TextStyle(color: Colors.white),
+      //   ),
+      //   backgroundColor: Colors.redAccent,
+      // ));
     }
+  }
+
+  void addBillingData(BuildContext context, Billing billing, List<BillingDetail> billingDetails) async {
+    var billingRequest = BillingRequest();
+
+    await billingRequest.saveBillingToDB(billing);
+    await billingRequest.saveBillingDetailsToDB(billingDetails);
+
+    final clearCartProvider = Provider.of<CartProvider>(context, listen: false);
+    clearCartProvider.clearCart();
   }
 
 

@@ -3,7 +3,9 @@ import 'package:shop_app/models/Cart.dart';
 import 'package:shop_app/models/LegoDetail.dart';
 import 'package:shop_app/models/Billing.dart';
 import 'package:shop_app/models/BillingDetail.dart';
+import 'package:shop_app/services/BillingRequest.dart';
 import 'package:shop_app/utils/preUtils.dart';
+import 'dart:math';
 
 class CartProvider with ChangeNotifier {
   List<Cart> _cart = [];
@@ -78,13 +80,40 @@ class CartProvider with ChangeNotifier {
     for (var cart in _cart) {
       totalPrice += cart.lego.price * cart.numOfItem;
     }
+    DateTime now = DateTime.now();
+    DateTime dateOnly = DateTime(now.year, now.month, now.day);
+
+    int generateRandomId() {
+      Random random = Random();
+      return random.nextInt(9001) + 1000; // Generates a random number between 2000 and 7000
+    }
+
+    Future<int> generateUniqueRandomId() async {
+      var billingRequest = BillingRequest();
+      int id = generateRandomId();
+
+      try {
+        Billing? billing = await billingRequest.getBillingByID(id);
+        while (billing != null) {
+          print('ID $id already exists');
+          id = generateRandomId();
+          billing = await billingRequest.getBillingByID(id);
+        }
+      } catch (e) {
+        print('Error fetching billing: $e');
+        throw Exception('Failed to check existing billing ID');
+      }
+
+      return id;
+    }
+
 
     final billing = Billing(
       accountEmail: accountEmail,
       dateCreated: DateTime.now(),
       datePaid: DateTime.now(),
-      id: DateTime.now().millisecondsSinceEpoch, // Generate a unique ID
-      status: 1, // Status example
+      id: generateRandomId(),
+      status: 1,
       totalPrice: totalPrice,
     );
 
@@ -94,7 +123,7 @@ class CartProvider with ChangeNotifier {
     for (var cart in _cart) {
       final billingDetail = BillingDetail(
         billingId: billing.id,
-        id: DateTime.now().millisecondsSinceEpoch + cart.lego.id,
+        id: generateRandomId(),
         legoId: cart.lego.id,
         quantity: cart.numOfItem,
       );
@@ -103,7 +132,7 @@ class CartProvider with ChangeNotifier {
       billingDetails.add(billingDetail);
     }
 
-    clearCart();
+    //clearCart();
 
     return {'billing': billing, 'billingDetails': billingDetails};
   }
