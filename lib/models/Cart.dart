@@ -1,16 +1,24 @@
-import 'Product.dart';
+import 'package:shop_app/models/LegoDetail.dart';
 
 class Cart {
-  final Product product;
-  final int numOfItem;
+  final LegoDetail lego;
+  int numOfItem;
 
-  Cart({required this.product, required this.numOfItem});
+  Cart({required this.lego, required this.numOfItem});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'lego': lego.toJson(),
+      'numOfItem': numOfItem,
+    };
+  }
+
+  factory Cart.fromJson(Map<String, dynamic> json) {
+    return Cart(
+      lego: LegoDetail.fromJson(json['lego']),
+      numOfItem: json['numOfItem'],
+    );
+  }
 }
 
-// Demo data for our cart
-
-List<Cart> demoCarts = [
-  Cart(product: demoProducts[0], numOfItem: 2),
-  Cart(product: demoProducts[1], numOfItem: 1),
-  Cart(product: demoProducts[3], numOfItem: 1),
-];
+List<Cart> myCart = [];

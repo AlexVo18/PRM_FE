@@ -1,4 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/models/Account.dart';
+import 'package:shop_app/services/AccountRequest.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
@@ -18,7 +23,6 @@ class _SignFormState extends State<SignForm> {
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
-  bool? remember = false;
   final List<String?> errors = [];
 
   void addError({String? error}) {
@@ -107,16 +111,6 @@ class _SignFormState extends State<SignForm> {
           const SizedBox(height: 20),
           Row(
             children: [
-              Checkbox(
-                value: remember,
-                activeColor: kPrimaryColor,
-                onChanged: (value) {
-                  setState(() {
-                    remember = value;
-                  });
-                },
-              ),
-              const Text("Remember me"),
               const Spacer(),
               GestureDetector(
                 onTap: () => Navigator.pushNamed(
@@ -131,12 +125,39 @@ class _SignFormState extends State<SignForm> {
           FormError(errors: errors),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                KeyboardUtil.hideKeyboard(context);
-                Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                try {
+                  final credential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: email!, password: password!);
+
+                  KeyboardUtil.hideKeyboard(context);
+                  //save to storage
+
+                  final accountRequest = AccountRequest();
+
+                  Account account =
+                      await accountRequest.getAccountDetail(email!);
+
+                  if (account != null) {
+                    Account.saveUser(account);
+                  }
+
+                  Navigator.pushNamed(context, LoginSuccessScreen.routeName);
+                } on FirebaseAuthException catch (e) {
+                  toastification.show(
+                    context: context,
+                    type: ToastificationType.error,
+                    style: ToastificationStyle.flat,
+                    title: const Text("Invalid credential"),
+                    alignment: Alignment.topCenter,
+                    autoCloseDuration: const Duration(seconds: 3),
+                    borderRadius: BorderRadius.circular(100.0),
+                    boxShadow: lowModeShadow,
+                  );
+                }
               }
             },
             child: const Text("Continue"),

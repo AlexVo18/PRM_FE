@@ -1,9 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shop_app/models/Account.dart';
+import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
+import 'package:shop_app/services/AccountRequest.dart';
+import 'package:toastification/toastification.dart';
 
 import '../../../components/custom_surfix_icon.dart';
 import '../../../components/form_error.dart';
 import '../../../constants/constants.dart';
-import '../../complete_profile/complete_profile_screen.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -12,12 +16,28 @@ class SignUpForm extends StatefulWidget {
   _SignUpFormState createState() => _SignUpFormState();
 }
 
+class RegisterData {
+  final String email;
+  final String
+      password; // Assuming password is also needed in CompleteProfileScreen
+
+  RegisterData({required this.email, required this.password});
+
+  Map<String, dynamic> toMap() => {
+        'email': email,
+        'password': password, // Add password if needed
+      };
+}
+
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
   String? email;
   String? password;
-  String? conform_password;
-  bool remember = false;
+  String? confirm_password;
+  String? name;
+  String? phoneNumber;
+  String? address;
+  final desiredDuration = 3;
   final List<String?> errors = [];
 
   void addError({String? error}) {
@@ -106,14 +126,14 @@ class _SignUpFormState extends State<SignUpForm> {
           const SizedBox(height: 20),
           TextFormField(
             obscureText: true,
-            onSaved: (newValue) => conform_password = newValue,
+            onSaved: (newValue) => confirm_password = newValue,
             onChanged: (value) {
               if (value.isNotEmpty) {
                 removeError(error: kPassNullError);
-              } else if (value.isNotEmpty && password == conform_password) {
+              } else if (value.isNotEmpty && password == confirm_password) {
                 removeError(error: kMatchPassError);
               }
-              conform_password = value;
+              confirm_password = value;
             },
             validator: (value) {
               if (value!.isEmpty) {
@@ -134,17 +154,166 @@ class _SignUpFormState extends State<SignUpForm> {
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
             ),
           ),
+          const SizedBox(height: 20),
+          TextFormField(
+            onSaved: (newValue) => name = newValue,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                removeError(error: kNamelNullError);
+              }
+              return;
+            },
+            validator: (value) {
+              if (value!.isEmpty) {
+                addError(error: kNamelNullError);
+                return "";
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: "Name",
+              hintText: "Enter your name",
+              // If  you are using latest version of flutter then lable text and hint text shown like this
+              // if you r using flutter less then 1.20.* then maybe this is not working properly
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/User.svg"),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextFormField(
+            keyboardType: TextInputType.phone,
+            onSaved: (newValue) => phoneNumber = newValue,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                removeError(error: kPhoneNumberNullError);
+              }
+              return;
+            },
+            validator: (value) {
+              if (value!.isEmpty) {
+                addError(error: kPhoneNumberNullError);
+                return "";
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: "Phone Number",
+              hintText: "Enter your phone number",
+              // If  you are using latest version of flutter then lable text and hint text shown like this
+              // if you r using flutter less then 1.20.* then maybe this is not working properly
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Phone.svg"),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextFormField(
+            onSaved: (newValue) => address = newValue,
+            onChanged: (value) {
+              if (value.isNotEmpty) {
+                removeError(error: kAddressNullError);
+              }
+              return;
+            },
+            validator: (value) {
+              if (value!.isEmpty) {
+                addError(error: kAddressNullError);
+                return "";
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              labelText: "Address",
+              hintText: "Enter your address",
+              // If  you are using latest version of flutter then lable text and hint text shown like this
+              // if you r using flutter less then 1.20.* then maybe this is not working properly
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              suffixIcon:
+                  CustomSurffixIcon(svgIcon: "assets/icons/Location point.svg"),
+            ),
+          ),
           FormError(errors: errors),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState!.save();
-                // if all are valid then go to success screen
-                Navigator.pushNamed(context, CompleteProfileScreen.routeName);
+
+                try {
+                  final credential = await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                    email: email!,
+                    password: password!,
+                  );
+                  //add to db
+                  final registerUser = Account(
+                    email: email!,
+                    displayName: name!,
+                    address: address!,
+                    phoneNumber: phoneNumber!,
+                    profilePicUrl:
+                        "https://firebasestorage.googleapis.com/v0/b/legoandroidapp-426102.appspot.com/o/Profile%20Image.png?alt=media&token=6e00421c-ad7a-4195-9792-c772e9a052c1",
+                    cart: [],
+                  );
+
+                  final accountRequest = AccountRequest();
+
+                  await accountRequest.createAccount(registerUser);
+
+                  toastification.show(
+                    context: context,
+                    type: ToastificationType.success,
+                    style: ToastificationStyle.flat,
+                    title: const Text('Create account successfully'),
+                    alignment: Alignment.topCenter,
+                    autoCloseDuration: const Duration(seconds: 4),
+                    borderRadius: BorderRadius.circular(100.0),
+                    boxShadow: lowModeShadow,
+                  );
+
+                  Navigator.pushNamed(context, SignInScreen.routeName);
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'weak-password') {
+                    toastification.show(
+                      context: context,
+                      type: ToastificationType.error,
+                      style: ToastificationStyle.flat,
+                      title: const Text(kWeekPassError),
+                      alignment: Alignment.topCenter,
+                      autoCloseDuration: const Duration(seconds: 4),
+                      borderRadius: BorderRadius.circular(100.0),
+                      boxShadow: lowModeShadow,
+                    );
+                    return;
+                  } else if (e.code == 'email-already-in-use') {
+                    toastification.show(
+                      context: context,
+                      type: ToastificationType.error,
+                      style: ToastificationStyle.flat,
+                      title: const Text(kEmailExist),
+                      alignment: Alignment.topCenter,
+                      autoCloseDuration: const Duration(seconds: 4),
+                      borderRadius: BorderRadius.circular(100.0),
+                      boxShadow: lowModeShadow,
+                    );
+                    return;
+                  } else {
+                    print('An error occurred during registration: ${e.code}');
+                  }
+                } catch (e) {
+                  toastification.show(
+                    context: context,
+                    type: ToastificationType.error,
+                    style: ToastificationStyle.flat,
+                    title: Text(e.toString()),
+                    alignment: Alignment.topCenter,
+                    autoCloseDuration: const Duration(seconds: 4),
+                    borderRadius: BorderRadius.circular(100.0),
+                    boxShadow: lowModeShadow,
+                  );
+                }
               }
             },
-            child: const Text("Continue"),
+            child: const Text("Register"),
           ),
         ],
       ),

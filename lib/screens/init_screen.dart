@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shop_app/constants/constants.dart';
+import 'package:shop_app/screens/chat/chatScreen.dart';
+import 'package:shop_app/screens/chat_staff/chatStaffScreen.dart';
 import 'package:shop_app/screens/favorite/favorite_screen.dart';
 import 'package:shop_app/screens/home/home_screen.dart';
 import 'package:shop_app/screens/map/map_screen.dart';
 import 'package:shop_app/screens/profile/profile_screen.dart';
+import 'package:shop_app/models/Account.dart';
+import 'package:shop_app/utils/preUtils.dart'; // Import your Account model
 
 const Color inActiveIconColor = Color(0xFFB6B6B6);
 
@@ -19,6 +23,15 @@ class InitScreen extends StatefulWidget {
 
 class _InitScreenState extends State<InitScreen> {
   int currentSelectedIndex = 0;
+  Account? _account; // Variable to hold the current user account
+
+  @override
+  void initState() {
+    super.initState();
+    _account =
+        PrefUtil.getCurrentUser(); // Fetch the current user's account details
+    setState(() {});
+  }
 
   void updateCurrentIndex(int index) {
     setState(() {
@@ -26,18 +39,26 @@ class _InitScreenState extends State<InitScreen> {
     });
   }
 
-  final pages = [
-    HomeScreen(),
-    const FavoriteScreen(),
-    const Center(
-      child: Text("Chat"),
-    ),
-    const ProfileScreen(),
-    const MapScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Determine if the current user is staff
+    bool isStaff = _account?.email == staffEmail;
+
+    // Create pages list conditionally including ChatStaffScreen
+    final pages = [
+      const HomeScreen(),
+      const FavoriteScreen(),
+      isStaff
+          ? const ChatStaffScreen()
+          : ChatScreen(
+              emailReceive: staffEmail,
+              emailSend: _account?.email ??
+                  '', // Replace with the actual sender's email
+            ),
+      const ProfileScreen(),
+      const MapScreen(),
+    ];
+
     return Scaffold(
       body: pages[currentSelectedIndex],
       bottomNavigationBar: BottomNavigationBar(

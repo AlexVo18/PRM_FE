@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../constants/constants.dart';
+import 'package:shop_app/models/Cart.dart';
 
 class CheckoutCard extends StatelessWidget {
   const CheckoutCard({
     Key? key,
+    required this.myCart,
+    required this.onClearCart,
   }) : super(key: key);
+
+  final List<Cart> myCart;
+  final VoidCallback onClearCart;
 
   @override
   Widget build(BuildContext context) {
+    double totalPrice = 0;
+
+    for (var cart in myCart) {
+      totalPrice += cart.lego.price * cart.numOfItem;
+    }
+
+    String formattedTotalPrice = totalPrice.toStringAsFixed(2);
+
     return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 16,
         horizontal: 20,
       ),
-      // height: 174,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.only(
@@ -35,39 +45,40 @@ class CheckoutCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F6F9),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: SvgPicture.asset("assets/icons/receipt.svg"),
-                ),
-                const Spacer(),
-                const Text("Add voucher code"),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 12,
-                  color: kTextColor,
-                )
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     Container(
+            //       padding: const EdgeInsets.all(10),
+            //       height: 40,
+            //       width: 40,
+            //       decoration: BoxDecoration(
+            //         color: const Color(0xFFF5F6F9),
+            //         borderRadius: BorderRadius.circular(10),
+            //       ),
+            //       child: SvgPicture.asset("assets/icons/receipt.svg"),
+            //     ),
+            //     const Spacer(),
+            //     const Text("Add voucher code"),
+            //     const SizedBox(width: 8),
+            //     const Icon(
+            //       Icons.arrow_forward_ios,
+            //       size: 12,
+            //       color: kTextColor,
+            //     )
+            //   ],
+            // ),
             const SizedBox(height: 16),
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text.rich(
                     TextSpan(
                       text: "Total:\n",
                       children: [
                         TextSpan(
-                          text: "\$337.15",
-                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          text: "\$$formattedTotalPrice",
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.black),
                         ),
                       ],
                     ),
@@ -79,6 +90,15 @@ class CheckoutCard extends StatelessWidget {
                     child: const Text("Check Out"),
                   ),
                 ),
+                const SizedBox(width: 16),
+                if (myCart.isNotEmpty) // Condition to display the trash button
+                  IconButton(
+                    onPressed: onClearCart,
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
               ],
             ),
           ],
