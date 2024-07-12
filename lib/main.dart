@@ -27,7 +27,6 @@ Future<void> main() async {
   Stripe.publishableKey = "pk_test_51PbO7LRpGRSEJtbQNNaAI6fymKKfuVzN2d7xeqvEpkqf9UEgg3STuNYp1ttFOLLDoZdmDg5tpCTyo2sEfr0YviLp00XrtkKiAU";
   await Stripe.instance.applySettings();
 
-  //runApp(MyApp());
   runApp(
     ChangeNotifierProvider(
       create: (context) => CartProvider()..loadCart(),
@@ -38,8 +37,6 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

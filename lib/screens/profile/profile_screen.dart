@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shop_app/screens/profile_update/profile_update_screen.dart';
+import 'package:shop_app/screens/payment_history/payment_history_screen.dart';
 import 'package:shop_app/screens/sign_in/sign_in_screen.dart';
 import 'package:toastification/toastification.dart';
 
@@ -41,9 +42,14 @@ class ProfileScreen extends StatelessWidget {
               press: () {},
             ),
             ProfileMenu(
-              text: "Help Center",
-              icon: "assets/icons/Question mark.svg",
-              press: () {},
+              text: "Payment History",
+              icon: "assets/icons/Bill Icon.svg",
+              press: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PaymentHistoryScreen(),
+                ),
+              ),
             ),
             ProfileMenu(
               text: "Log Out",

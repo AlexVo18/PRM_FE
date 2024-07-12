@@ -4,6 +4,7 @@ import 'package:shop_app/screens/chat_staff/chatStaffScreen.dart';
 import 'package:shop_app/screens/products/products_screen.dart';
 import 'package:shop_app/screens/search/search_screen.dart';
 import 'package:shop_app/screens/search/search_theme_screen.dart';
+import 'package:shop_app/screens/payment_history/payment_history_screen.dart';
 
 import 'screens/cart/cart_screen.dart';
 import 'screens/profile_update/profile_update_screen.dart';
@@ -41,4 +42,5 @@ final Map<String, WidgetBuilder> routes = {
         emailSend: '',
         emailReceive: '',
       ),
+  // PaymentHistoryScreen.routeName: (context) => const PaymentHistoryScreen(),
 };
