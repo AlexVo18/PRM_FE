@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/components/product_card.dart';
 import 'package:shop_app/constants/constants.dart';
+import 'package:shop_app/models/Lego.dart';
 import 'package:shop_app/models/LegoDetail.dart';
 import 'package:shop_app/provider/CartProvider.dart';
 import 'package:shop_app/screens/cart/cart_screen.dart';
@@ -16,9 +18,7 @@ import 'components/top_rounded_container.dart';
 class DetailsScreen extends StatefulWidget {
   static String routeName = "/details";
 
-  const DetailsScreen({
-    super.key,
-  });
+  const DetailsScreen({super.key});
 
   @override
   _DetailsScreenState createState() => _DetailsScreenState();
@@ -27,7 +27,7 @@ class DetailsScreen extends StatefulWidget {
 class _DetailsScreenState extends State<DetailsScreen> {
   LegoDetail? product;
   bool _isLoading = true;
-  bool _hasError = false;
+  List<Lego>? legoList;
 
   @override
   void didChangeDependencies() {
@@ -35,6 +35,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     final ProductDetailsArguments args =
         ModalRoute.of(context)!.settings.arguments as ProductDetailsArguments;
     _fetchLegoDetail(args.id);
+    _fetchLegoList();
   }
 
   Future<void> _fetchLegoDetail(int id) async {
@@ -44,20 +45,26 @@ class _DetailsScreenState extends State<DetailsScreen> {
         product = fetchedLegoDetail;
         _isLoading = false;
       });
+      print('Fetched Lego detail: $fetchedLegoDetail');
     } catch (error) {
       setState(() {
-        _hasError = true;
         _isLoading = false;
       });
       print('Error fetching Lego detail: $error');
     }
   }
 
-  Future<void> _loadCounter() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      //_counter = prefs.getInt('counter') ?? 0;
-    });
+  Future<void> _fetchLegoList() async {
+    try {
+      final fetchedLegoList = await LegoRequest().fetchRecentLegoList();
+      setState(() {
+        legoList = fetchedLegoList;
+        _isLoading = false;
+      });
+      print('Fetched Lego list: $fetchedLegoList');
+    } catch (error) {
+      print('Error fetching Lego list: $error');
+    }
   }
 
   void _addToCart(LegoDetail lego) {
@@ -151,22 +158,97 @@ class _DetailsScreenState extends State<DetailsScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              children: [
-                ProductImages(product: product!),
-                TopRoundedContainer(
-                  color: Colors.white,
-                  child: Column(
-                    children: [
-                      ProductDescription(
-                        product: product!,
-                        pressOnSeeMore: () {},
+          : product == null || legoList == null
+              ? const Center(child: Text("No data available"))
+              : ListView(
+                  children: [
+                    ProductImages(product: product!),
+                    TopRoundedContainer(
+                      color: Colors.white,
+                      child: Column(
+                        children: [
+                          ProductDescription(
+                            product: product!,
+                            pressOnSeeMore: () {},
+                          ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    TopRoundedContainer(
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 40),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Divider(
+                                          thickness: 1,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Text(
+                                          "Other Products",
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Divider(
+                                          thickness: 1,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: GridView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: legoList!.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                                  maxCrossAxisExtent: 200,
+                                  childAspectRatio: 0.7,
+                                  mainAxisSpacing: 20,
+                                  crossAxisSpacing: 16,
+                                ),
+                                itemBuilder: (context, index) => ProductCard(
+                                  product: legoList![index],
+                                  onPress: () => Navigator.pushNamed(
+                                    context,
+                                    DetailsScreen.routeName,
+                                    arguments: ProductDetailsArguments(
+                                        id: legoList![index].id),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ))
+                  ],
                 ),
-              ],
-            ),
       bottomNavigationBar: TopRoundedContainer(
         color: Colors.white,
         child: SafeArea(
