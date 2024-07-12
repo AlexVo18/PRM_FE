@@ -134,9 +134,6 @@ class CheckoutCard extends StatelessWidget {
 
     await billingRequest.saveBillingToDB(billing);
     await billingRequest.saveBillingDetailsToDB(billingDetails);
-
-    final clearCartProvider = Provider.of<CartProvider>(context, listen: false);
-    clearCartProvider.clearCart();
   }
 
 
