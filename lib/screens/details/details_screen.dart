@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/constants/constants.dart';
 import 'package:shop_app/models/LegoDetail.dart';
-import 'package:shop_app/provider/CartProvider.dart';
+import 'package:shop_app/provider/cart_provider.dart';
 import 'package:shop_app/screens/cart/cart_screen.dart';
 import 'package:shop_app/services/legoRequest.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';

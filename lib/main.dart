@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shop_app/provider/CartProvider.dart';
+import 'package:shop_app/provider/cart_provider.dart';
 import 'package:shop_app/screens/splash/splash_screen.dart';
 import 'package:shop_app/utils/preUtils.dart';
 import 'package:shop_app/utils/utils.dart';
@@ -24,9 +25,19 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   PrefUtil.init();
-  Stripe.publishableKey = "pk_test_51PbO7LRpGRSEJtbQNNaAI6fymKKfuVzN2d7xeqvEpkqf9UEgg3STuNYp1ttFOLLDoZdmDg5tpCTyo2sEfr0YviLp00XrtkKiAU";
+  Stripe.publishableKey =
+      "pk_test_51PbO7LRpGRSEJtbQNNaAI6fymKKfuVzN2d7xeqvEpkqf9UEgg3STuNYp1ttFOLLDoZdmDg5tpCTyo2sEfr0YviLp00XrtkKiAU";
   await Stripe.instance.applySettings();
 
+  bool isSupported = await FlutterAppBadger.isAppBadgeSupported();
+  if (isSupported) {
+    print("Device supports app badges.");
+    FlutterAppBadger.updateBadgeCount(5);
+  } else {
+    print("Device does not support app badges.");
+  }
+
+  //runApp(MyApp());
   runApp(
     ChangeNotifierProvider(
       create: (context) => CartProvider()..loadCart(),

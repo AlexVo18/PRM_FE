@@ -5,7 +5,7 @@ import 'package:shop_app/models/Cart.dart';
 import 'package:shop_app/models/Billing.dart';
 import 'package:shop_app/models/BillingDetail.dart';
 import 'package:shop_app/payment.dart';
-import 'package:shop_app/provider/CartProvider.dart';
+import 'package:shop_app/provider/cart_provider.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:shop_app/services/BillingRequest.dart';
 
@@ -53,9 +53,11 @@ class CheckoutCard extends StatelessWidget {
                   print("Email is null.");
                 }
                 final Billing billing = result['billing'];
-                final List<BillingDetail> billingDetails = result['billingDetails'];
+                final List<BillingDetail> billingDetails =
+                    result['billingDetails'];
                 Navigator.of(context).pop();
-                initPaymentSheet(context, billing.accountEmail, billing, billingDetails);
+                initPaymentSheet(
+                    context, billing.accountEmail, billing, billingDetails);
               },
               child: const Text("Confirm"),
             ),
@@ -67,7 +69,8 @@ class CheckoutCard extends StatelessWidget {
 
   final String selectedCurrency = 'USD';
 
-  Future<void> initPaymentSheet(BuildContext context, String email, Billing billing, List<BillingDetail> billingDetails) async {
+  Future<void> initPaymentSheet(BuildContext context, String email,
+      Billing billing, List<BillingDetail> billingDetails) async {
     try {
       final data = await createPaymentIntent(
         totalAmount: billing.totalPrice.toString(),
@@ -83,16 +86,14 @@ class CheckoutCard extends StatelessWidget {
         );
         await Stripe.instance.initPaymentSheet(
             paymentSheetParameters: SetupPaymentSheetParameters(
-              paymentIntentClientSecret: data['client_secret'],
-              style: ThemeMode.dark,
-              merchantDisplayName: 'Lego Company (Group 3 division)',
-              googlePay: gpay,
-            )
-        );
+          paymentIntentClientSecret: data['client_secret'],
+          style: ThemeMode.dark,
+          merchantDisplayName: 'Lego Company (Group 3 division)',
+          googlePay: gpay,
+        ));
       }
 
       displayPaymentSheet(context, email, billing, billingDetails);
-
     } catch (e) {
       print('Payment sheet failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -102,7 +103,8 @@ class CheckoutCard extends StatelessWidget {
     }
   }
 
-  void displayPaymentSheet(BuildContext context, String email, Billing billing, List<BillingDetail> billingDetails) async {
+  void displayPaymentSheet(BuildContext context, String email, Billing billing,
+      List<BillingDetail> billingDetails) async {
     try {
       await Stripe.instance.presentPaymentSheet();
 
@@ -115,7 +117,6 @@ class CheckoutCard extends StatelessWidget {
       // ));
 
       addBillingData(context, billing, billingDetails);
-
     } catch (e) {
       print("Error + $e");
       print("Failed ABC");
@@ -129,13 +130,13 @@ class CheckoutCard extends StatelessWidget {
     }
   }
 
-  void addBillingData(BuildContext context, Billing billing, List<BillingDetail> billingDetails) async {
+  void addBillingData(BuildContext context, Billing billing,
+      List<BillingDetail> billingDetails) async {
     var billingRequest = BillingRequest();
 
     await billingRequest.saveBillingToDB(billing);
     await billingRequest.saveBillingDetailsToDB(billingDetails);
   }
-
 
   @override
   Widget build(BuildContext context) {

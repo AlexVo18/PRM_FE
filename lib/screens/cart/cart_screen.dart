@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/provider/CartProvider.dart';
+import 'package:shop_app/provider/cart_provider.dart';
 
 import '../../models/Cart.dart';
 import 'components/cart_card.dart';
