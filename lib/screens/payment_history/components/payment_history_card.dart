@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shop_app/models/Billing.dart';
 import 'package:intl/intl.dart';
 
+import '../../payment_history_detail/payment_history_detail_screen.dart';
+
 class PaymentHistoryCard extends StatelessWidget {
   final Billing billing;
 
@@ -10,22 +12,34 @@ class PaymentHistoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat('dd-MM-yyyy').format(billing.datePaid);
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Date: $formattedDate',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.orange),
-            ),
-            SizedBox(height: 8),
-            Text('Total amount: \$${billing.totalPrice.toStringAsFixed(2)}'),
-            SizedBox(height: 8),
-            Text('Email: ${billing.accountEmail}'),
-          ],
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BillingDetailsScreen(billing: billing),
+          ),
+        );
+      },
+
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Date: $formattedDate',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.orange),
+              ),
+              SizedBox(height: 8),
+              Text('Total amount: \$${billing.totalPrice.toStringAsFixed(2)}'),
+              SizedBox(height: 8),
+              Text('Email: ${billing.accountEmail}'),
+            ],
+          ),
         ),
       ),
     );

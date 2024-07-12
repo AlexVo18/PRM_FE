@@ -16,7 +16,7 @@ class PaymentHistoryScreen extends StatelessWidget {
         title: Text('Payment History'),
       ),
       body: FutureBuilder<List<Billing>>(
-        future: _fetchBillingHistory(),
+        future: fetchBillingHistory(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -35,7 +35,7 @@ class PaymentHistoryScreen extends StatelessWidget {
     );
   }
 
-  Future<List<Billing>> _fetchBillingHistory() async {
+  Future<List<Billing>> fetchBillingHistory() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('userEmail');
     if (email != null) {
