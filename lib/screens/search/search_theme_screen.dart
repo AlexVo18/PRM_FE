@@ -17,7 +17,9 @@ class SearchThemeScreen extends StatefulWidget {
 class _SearchThemeScreenState extends State<SearchThemeScreen> {
   final LegoRequest request = LegoRequest();
   List<Lego>? legoList;
+  List<Lego>? filteredLegoList;
   bool _isLoading = true;
+  bool _isAscending = true;
   late String themeName;
 
   @override
@@ -34,11 +36,21 @@ class _SearchThemeScreenState extends State<SearchThemeScreen> {
       final fetchedLegoList = await request.fetchThemedLegoList(themeid);
       setState(() {
         legoList = fetchedLegoList;
+        filteredLegoList = List.from(fetchedLegoList ?? []);
         _isLoading = false;
       });
     } catch (error) {
       print('Error fetching Lego list: $error');
     }
+  }
+
+  void _sortLegoList() {
+    setState(() {
+      filteredLegoList!.sort((a, b) => _isAscending
+          ? a.price.compareTo(b.price)
+          : b.price.compareTo(a.price));
+      _isAscending = !_isAscending;
+    });
   }
 
   @override
@@ -52,23 +64,54 @@ class _SearchThemeScreenState extends State<SearchThemeScreen> {
           : SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GridView.builder(
-                  itemCount: legoList!.length,
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 200,
-                    childAspectRatio: 0.7,
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 16,
-                  ),
-                  itemBuilder: (context, index) => ProductCard(
-                    product: legoList![index],
-                    onPress: () => Navigator.pushNamed(
-                      context,
-                      DetailsScreen.routeName,
-                      arguments:
-                          ProductDetailsArguments(id: legoList![index].id),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: _sortLegoList,
+                            child: Row(
+                              children: [
+                                const Text("Price"),
+                                Icon(_isAscending
+                                    ? Icons.arrow_downward
+                                    : Icons.arrow_upward),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    Expanded(
+                      child:
+                          filteredLegoList == null || filteredLegoList!.isEmpty
+                              ? const Center(
+                                  child: Text("No product available"),
+                                )
+                              : GridView.builder(
+                                  itemCount: filteredLegoList!.length,
+                                  gridDelegate:
+                                      const SliverGridDelegateWithMaxCrossAxisExtent(
+                                    maxCrossAxisExtent: 200,
+                                    childAspectRatio: 0.7,
+                                    mainAxisSpacing: 20,
+                                    crossAxisSpacing: 16,
+                                  ),
+                                  itemBuilder: (context, index) => ProductCard(
+                                    product: filteredLegoList![index],
+                                    onPress: () => Navigator.pushNamed(
+                                      context,
+                                      DetailsScreen.routeName,
+                                      arguments: ProductDetailsArguments(
+                                          id: filteredLegoList![index].id),
+                                    ),
+                                  ),
+                                ),
+                    ),
+                  ],
                 ),
               ),
             ),

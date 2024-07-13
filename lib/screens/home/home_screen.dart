@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/models/Lego.dart';
+import 'package:shop_app/models/ThemeCount.dart';
 import 'package:shop_app/services/legoRequest.dart';
+import 'package:shop_app/services/themeRequest.dart';
 import 'components/categories.dart';
 import 'components/discount_banner.dart';
 import 'components/home_header.dart';
@@ -18,6 +20,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final LegoRequest request = LegoRequest();
+  final ThemeRequest themeRequest = ThemeRequest();
+
+  late List<ThemeCount> themeCounts;
   List<Lego>? recentList;
   List<Lego>? popularList;
   bool _isLoading = true;
@@ -32,9 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final fetchedRecentList = await request.fetchRecentLegoList();
       final fetchedPopularList = await request.fetchPopularLegoList();
+      final fetchedThemeCounts = await themeRequest.fetchThemeCount();
       setState(() {
         recentList = fetchedRecentList;
         popularList = fetchedPopularList;
+        themeCounts = fetchedThemeCounts;
         _isLoading = false;
       });
     } catch (error) {
@@ -58,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const HomeHeader(),
                     const DiscountBanner(),
                     const Categories(),
-                    const SpecialOffers(),
+                    SpecialOffers(themeCounts: themeCounts),
                     const SizedBox(height: 20),
                     PopularProducts(
                         legoList: popularList, title: "Popular Products"),

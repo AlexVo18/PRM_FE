@@ -47,16 +47,15 @@ class _InitScreenState extends State<InitScreen> {
     // Create pages list conditionally including ChatStaffScreen
     final pages = [
       const HomeScreen(),
-      const FavoriteScreen(),
       isStaff
           ? const ChatStaffScreen()
           : ChatScreen(
-              emailReceive: staffEmail,
-              emailSend: _account?.email ??
-                  '', // Replace with the actual sender's email
-            ),
-      const ProfileScreen(),
+        emailReceive: staffEmail,
+        emailSend: _account?.email ??
+            '', // Replace with the actual sender's email
+      ),
       const MapScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
@@ -87,25 +86,6 @@ class _InitScreenState extends State<InitScreen> {
           ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
-              "assets/icons/Shopping Icon.svg",
-              height: 25,
-              colorFilter: const ColorFilter.mode(
-                inActiveIconColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            activeIcon: SvgPicture.asset(
-              "assets/icons/Shopping Icon.svg",
-              height: 25,
-              colorFilter: const ColorFilter.mode(
-                kPrimaryColor,
-                BlendMode.srcIn,
-              ),
-            ),
-            label: "Fav",
-          ),
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
               "assets/icons/Chat bubble Icon.svg",
               colorFilter: const ColorFilter.mode(
                 inActiveIconColor,
@@ -121,6 +101,17 @@ class _InitScreenState extends State<InitScreen> {
             ),
             label: "Chat",
           ),
+          const BottomNavigationBarItem(
+            icon: Icon(
+              Icons.map,
+              color: inActiveIconColor,
+            ),
+            activeIcon: Icon(
+              Icons.map,
+              color: kPrimaryColor,
+            ),
+            label: "Map",
+          ),
           BottomNavigationBarItem(
             icon: SvgPicture.asset(
               "assets/icons/User Icon.svg",
@@ -137,17 +128,6 @@ class _InitScreenState extends State<InitScreen> {
               ),
             ),
             label: "Fav",
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(
-              Icons.map,
-              color: inActiveIconColor,
-            ),
-            activeIcon: Icon(
-              Icons.map,
-              color: kPrimaryColor,
-            ),
-            label: "Map",
           ),
         ],
       ),
