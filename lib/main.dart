@@ -5,6 +5,7 @@ import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/api/notifi_service.dart';
 import 'package:shop_app/provider/cart_provider.dart';
 import 'package:shop_app/screens/splash/splash_screen.dart';
 import 'package:shop_app/utils/preUtils.dart';
@@ -18,12 +19,19 @@ import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   // Initialize Firebase asynchronously before creating the MaterialApp widget
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  NotificationService notificationService = NotificationService();
+  await notificationService.initNotification();
+  await notificationService.requestExactAlarmPermission();
+
   PrefUtil.init();
   Stripe.publishableKey =
       "pk_test_51PbO7LRpGRSEJtbQNNaAI6fymKKfuVzN2d7xeqvEpkqf9UEgg3STuNYp1ttFOLLDoZdmDg5tpCTyo2sEfr0YviLp00XrtkKiAU";
@@ -55,6 +63,7 @@ class MyApp extends StatelessWidget {
       title: 'lego App',
       theme: AppTheme.lightTheme(context),
       initialRoute: SplashScreen.routeName,
+      navigatorKey: navigatorKey,
       routes: routes,
     );
   }

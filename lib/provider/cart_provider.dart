@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shop_app/api/notifi_service.dart';
 import 'package:shop_app/models/Cart.dart';
 import 'package:shop_app/models/LegoDetail.dart';
 import 'package:shop_app/models/Billing.dart';
@@ -13,10 +14,13 @@ class CartProvider with ChangeNotifier {
   ValueNotifier<int> cartItemCount = ValueNotifier<int>(0);
   List<Cart> get cart => _cart;
 
+  final NotificationService _notificationService = NotificationService();
+
   set cart(List<Cart> newCart) {
     _cart = newCart;
     cartItemCount.value = _cart.length;
     notifyListeners();
+    _scheduleCartNotification();
   }
 
   Future<void> loadCart() async {
@@ -25,6 +29,7 @@ class CartProvider with ChangeNotifier {
     cartItemCount.value = _cart.length;
     _updateBadgeCount();
     notifyListeners();
+    _scheduleCartNotification();
   }
 
   Future<void> saveCart() async {
@@ -48,6 +53,7 @@ class CartProvider with ChangeNotifier {
     _updateBadgeCount();
     PrefUtil.saveCartForCurrentUser(_cart);
     notifyListeners();
+    _scheduleCartNotification();
   }
 
   void clearCart() {
@@ -63,6 +69,7 @@ class CartProvider with ChangeNotifier {
     _updateBadgeCount();
     PrefUtil.saveCartForCurrentUser(_cart);
     notifyListeners();
+    _scheduleCartNotification();
   }
 
   void decrementQuantity(int index) {
@@ -71,6 +78,7 @@ class CartProvider with ChangeNotifier {
       _updateBadgeCount();
       PrefUtil.saveCartForCurrentUser(_cart);
       notifyListeners();
+      _scheduleCartNotification();
     }
   }
 
@@ -80,6 +88,10 @@ class CartProvider with ChangeNotifier {
     _updateBadgeCount();
     PrefUtil.saveCartForCurrentUser(_cart);
     notifyListeners();
+
+    if (_cart.isNotEmpty) {
+      _scheduleCartNotification();
+    }
   }
 
   Future<Map<String, dynamic>> saveToBilling(String accountEmail) async {
@@ -150,5 +162,26 @@ class CartProvider with ChangeNotifier {
     } else {
       FlutterAppBadger.removeBadge();
     }
+  }
+
+  void _scheduleCartNotification() {
+    _cancelCartNotification();
+
+    if (_cart.isNotEmpty) {
+      print('Start schedule notification');
+      DateTime scheduledDate = DateTime.now().add(const Duration(seconds: 10));
+      _notificationService.scheduleNotification(
+        id: 1,
+        title: 'Items in your cart',
+        body: 'You have items in your cart waiting for checkout!',
+        scheduledDate: scheduledDate,
+      );
+    } else {
+      _cancelCartNotification();
+    }
+  }
+
+  void _cancelCartNotification() {
+    _notificationService.cancelNotification(1);
   }
 }

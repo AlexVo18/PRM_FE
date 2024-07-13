@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shop_app/api/notifi_service.dart';
 import 'package:shop_app/models/Cart.dart';
 import 'package:shop_app/models/Billing.dart';
 import 'package:shop_app/models/BillingDetail.dart';
@@ -26,7 +27,7 @@ class CheckoutCard extends StatelessWidget {
       builder: (context) {
         return AlertDialog(
           title: const Text("Confirm check out !"),
-          content: SingleChildScrollView(
+          content: const SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -192,6 +193,10 @@ class CheckoutCard extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () => _showCartDialog(context),
+                    // onPressed: () {
+                    //   NotificationService().showNotification(
+                    //       title: 'Sample title', body: 'It works!');
+                    // },
                     child: const Text("Check Out"),
                   ),
                 ),
