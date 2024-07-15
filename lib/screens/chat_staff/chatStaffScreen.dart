@@ -37,7 +37,12 @@ class _chatStaffScreenState extends State<ChatStaffScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No accounts found'));
           } else {
-            final accounts = snapshot.data!;
+            final accounts = snapshot.data!
+                .where((account) => account.email != staffEmail)
+                .toList();
+            if (accounts.isEmpty) {
+              return const Center(child: Text('No accounts found'));
+            }
             return ListView.builder(
               itemCount: accounts.length,
               itemBuilder: (context, index) {
