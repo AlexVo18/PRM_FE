@@ -16,13 +16,21 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Profile"),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 20),
         child: Column(
           children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Your settings',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             const ProfilePic(),
             const SizedBox(height: 20),
             ProfileMenu(
@@ -47,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
               press: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => PaymentHistoryScreen(),
+                  builder: (context) => PaymentHistoryScreen(),
                 ),
               ),
             ),

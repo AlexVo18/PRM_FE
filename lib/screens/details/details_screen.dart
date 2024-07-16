@@ -159,7 +159,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : product == null || legoList == null
-              ? const Center(child: Text("No data available"))
+              ? const Center(child: CircularProgressIndicator())
               : ListView(
                   children: [
                     ProductImages(product: product!),

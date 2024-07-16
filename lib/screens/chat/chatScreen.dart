@@ -194,7 +194,7 @@ class _ChatScreenState extends State<ChatScreen> {
               padding: const EdgeInsets.fromLTRB(16, 30, 16, 16),
               alignment: Alignment.centerLeft,
               child: const Text(
-                'Chat with Store',
+                'Chat with store',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
