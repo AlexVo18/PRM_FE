@@ -151,7 +151,7 @@ class CartProvider with ChangeNotifier {
       billingDetails.add(billingDetail);
     }
 
-    clearCart();
+    //clearCart();
 
     return {'billing': billing, 'billingDetails': billingDetails};
   }

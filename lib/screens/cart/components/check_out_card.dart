@@ -52,7 +52,7 @@ class CheckoutCard extends StatelessWidget {
                     result['billingDetails'];
                 Navigator.of(context).pop();
                 initPaymentSheet(
-                    context, billing.accountEmail, billing, billingDetails);
+                    context, billing.accountEmail, billing, billingDetails, cartProvider);
               },
               child: const Text("Confirm"),
             ),
@@ -65,7 +65,7 @@ class CheckoutCard extends StatelessWidget {
   final String selectedCurrency = 'USD';
 
   Future<void> initPaymentSheet(BuildContext context, String email,
-      Billing billing, List<BillingDetail> billingDetails) async {
+      Billing billing, List<BillingDetail> billingDetails, CartProvider cartProvider) async {
     try {
       final data = await createPaymentIntent(
         totalAmount: billing.totalPrice.toString(),
@@ -88,7 +88,7 @@ class CheckoutCard extends StatelessWidget {
         ));
       }
 
-      displayPaymentSheet(context, email, billing, billingDetails);
+      displayPaymentSheet(context, email, billing, billingDetails, cartProvider);
     } catch (e) {
       print('Payment sheet failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -99,38 +99,26 @@ class CheckoutCard extends StatelessWidget {
   }
 
   void displayPaymentSheet(BuildContext context, String email, Billing billing,
-      List<BillingDetail> billingDetails) async {
+      List<BillingDetail> billingDetails, CartProvider cartProvider) async {
     try {
       await Stripe.instance.presentPaymentSheet();
 
-      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //   content: Text(
-      //     "Payment Done",
-      //     style: TextStyle(color: Colors.white),
-      //   ),
-      //   backgroundColor: Colors.green,
-      // ));
-
-      addBillingData(context, billing, billingDetails);
+      addBillingData(context, billing, billingDetails, cartProvider);
     } catch (e) {
       print("Error + $e");
       print("Failed ABC");
-      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //   content: Text(
-      //     "Payment Failed",
-      //     style: TextStyle(color: Colors.white),
-      //   ),
-      //   backgroundColor: Colors.redAccent,
-      // ));
     }
   }
 
   void addBillingData(BuildContext context, Billing billing,
-      List<BillingDetail> billingDetails) async {
+      List<BillingDetail> billingDetails, CartProvider cartProvider) async {
     var billingRequest = BillingRequest();
 
     await billingRequest.saveBillingToDB(billing);
     await billingRequest.saveBillingDetailsToDB(billingDetails);
+
+    //clear cart
+    cartProvider.clearCart();
   }
 
   @override
