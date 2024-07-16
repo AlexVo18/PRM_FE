@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/models/Account.dart';
 import 'package:shop_app/services/AccountRequest.dart';
@@ -13,7 +13,9 @@ import '../../forgot_password/forgot_password_screen.dart';
 import '../../login_success/login_success_screen.dart';
 
 class SignForm extends StatefulWidget {
-  const SignForm({super.key});
+  final Function(bool) setLoadingState;
+
+  const SignForm({super.key, required this.setLoadingState});
 
   @override
   _SignFormState createState() => _SignFormState();
@@ -76,8 +78,6 @@ class _SignFormState extends State<SignForm> {
             decoration: const InputDecoration(
               labelText: "Email",
               hintText: "Enter your email",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Mail.svg"),
             ),
@@ -107,8 +107,6 @@ class _SignFormState extends State<SignForm> {
             decoration: const InputDecoration(
               labelText: "Password",
               hintText: "Enter your password",
-              // If  you are using latest version of flutter then lable text and hint text shown like this
-              // if you r using flutter less then 1.20.* then maybe this is not working properly
               floatingLabelBehavior: FloatingLabelBehavior.always,
               suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
             ),
@@ -132,15 +130,14 @@ class _SignFormState extends State<SignForm> {
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
+                widget.setLoadingState(true);
                 _formKey.currentState!.save();
                 try {
                   final credential = await FirebaseAuth.instance
                       .signInWithEmailAndPassword(
-                          email: email!, password: password!);
+                      email: email!, password: password!);
 
                   KeyboardUtil.hideKeyboard(context);
-                  //save to storage
-
                   await saveEmailToPreferences(email!);
 
                   final accountRequest = AccountRequest();
@@ -161,6 +158,8 @@ class _SignFormState extends State<SignForm> {
                     borderRadius: BorderRadius.circular(100.0),
                     boxShadow: lowModeShadow,
                   );
+                } finally {
+                  widget.setLoadingState(false);
                 }
               }
             },

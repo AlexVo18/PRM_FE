@@ -11,17 +11,25 @@ class BillingDetailsScreen extends StatelessWidget {
 
   final Billing billing;
 
-  const BillingDetailsScreen({Key? key, required this.billing}) : super(key: key);
+  const BillingDetailsScreen({Key? key, required this.billing})
+      : super(key: key);
 
-  Future<List<BillingDetail>> fetchBillingDetail() async {
+  Future<Map<String, dynamic>> fetchBillingAndLegoDetails() async {
     final billingRequest = BillingRequest();
-    return billingRequest.getBillingRequestByBillingId(billing.id);
-  }
+    List<BillingDetail> billingDetails =
+        await billingRequest.getBillingRequestByBillingId(billing.id);
 
-  Future<LegoDetail> legoDetail(int id) async {
     final legoRequest = LegoRequest();
-    LegoDetail lego = await legoRequest.fetchLegoDetail(id);
-    return lego;
+    List<LegoDetail> legoDetails = await Future.wait(
+      billingDetails
+          .map((detail) => legoRequest.fetchLegoDetail(detail.legoId))
+          .toList(),
+    );
+
+    return {
+      'billingDetails': billingDetails,
+      'legoDetails': legoDetails,
+    };
   }
 
   @override
@@ -32,63 +40,54 @@ class BillingDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Billing Details'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Date: $formattedDate',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text('Total amount: \$${billing.totalPrice.toStringAsFixed(2)}'),
-            SizedBox(height: 8),
-            Text('Email: ${billing.accountEmail}'),
-            SizedBox(height: 16),
-            FutureBuilder<List<BillingDetail>>(
-              future: fetchBillingDetail(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No billing details found.'));
-                } else {
-                  return Expanded(
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: fetchBillingAndLegoDetails(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No billing details found.'));
+          } else {
+            List<BillingDetail> billingDetails =
+                snapshot.data!['billingDetails'];
+            List<LegoDetail> legoDetails = snapshot.data!['legoDetails'];
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Date: $formattedDate',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                      'Total amount: \$${billing.totalPrice.toStringAsFixed(2)}'),
+                  SizedBox(height: 8),
+                  Text('Email: ${billing.accountEmail}'),
+                  SizedBox(height: 16),
+                  Expanded(
                     child: ListView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: billingDetails.length,
                       itemBuilder: (context, index) {
-                        BillingDetail detail = snapshot.data![index];
-                        return FutureBuilder<LegoDetail>(
-                          future: legoDetail(detail.legoId),
-                          builder: (context, legoSnapshot) {
-                            if (legoSnapshot.connectionState == ConnectionState.waiting) {
-                              return ListTile(
-                                title: Text('Loading...'),
-                              );
-                            } else if (legoSnapshot.hasError) {
-                              return ListTile(
-                                title: Text('Error: ${legoSnapshot.error}'),
-                              );
-                            } else {
-                              return ListTile(
-                                title: Text('Item Name: ${legoSnapshot.data!.name}'),
-                                subtitle: Text('Price: ${legoSnapshot.data!.price}'),
-                                trailing: Text('Quantity: ${detail.quantity}'),
-                              );
-                            }
-                          },
+                        BillingDetail detail = billingDetails[index];
+                        LegoDetail lego = legoDetails[index];
+                        return ListTile(
+                          title: Text('Item Name: ${lego.name}'),
+                          subtitle: Text('Price: ${lego.price}'),
+                          trailing: Text('Quantity: ${detail.quantity}'),
                         );
                       },
                     ),
-                  );
-                }
-              },
-            ),
-          ],
-        ),
+                  ),
+                ],
+              ),
+            );
+          }
+        },
       ),
     );
   }

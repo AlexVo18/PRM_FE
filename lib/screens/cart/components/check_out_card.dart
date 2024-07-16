@@ -26,7 +26,7 @@ class CheckoutCard extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Confirm check out !"),
+          title: const Text("Confirmation"),
           content: const SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -37,12 +37,6 @@ class CheckoutCard extends StatelessWidget {
             ),
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text("Close"),
-            ),
             ElevatedButton(
               onPressed: () async {
                 SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -10,7 +10,9 @@ import '../../../components/form_error.dart';
 import '../../../constants/constants.dart';
 
 class SignUpForm extends StatefulWidget {
-  const SignUpForm({super.key});
+  final Function(bool) setLoadingState;
+
+  const SignUpForm({super.key, required this.setLoadingState});
 
   @override
   _SignUpFormState createState() => _SignUpFormState();
@@ -236,6 +238,7 @@ class _SignUpFormState extends State<SignUpForm> {
           ElevatedButton(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
+                widget.setLoadingState(true);
                 _formKey.currentState!.save();
 
                 try {
@@ -310,6 +313,8 @@ class _SignUpFormState extends State<SignUpForm> {
                     borderRadius: BorderRadius.circular(100.0),
                     boxShadow: lowModeShadow,
                   );
+                } finally {
+                  widget.setLoadingState(false);
                 }
               }
             },

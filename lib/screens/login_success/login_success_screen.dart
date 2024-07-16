@@ -8,10 +8,6 @@ class LoginSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: const SizedBox(),
-        title: const Text("Login Success"),
-      ),
       body: Column(
         children: [
           const SizedBox(height: 16),
