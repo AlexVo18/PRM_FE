@@ -12,8 +12,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   final locationController = Location();
-  static const legoStore = LatLng(10.875441247362792, 106.80191659652543);
-  //static const mountainView = LatLng(10.880805327119527, 106.80699950625984);
+  static const legoStore = LatLng(10.875387192960831, 106.80136712563743);
 
   LatLng? currentPosition;
 
@@ -26,52 +25,50 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            // child: ElevatedButton(
-            //   onPressed: () {
-            //     Navigator.pop(context);
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     shape: const CircleBorder(),
-            //     padding: EdgeInsets.zero,
-            //     elevation: 0,
-            //     backgroundColor: Colors.white,
-            //   ),
-            //   child: const Icon(
-            //     Icons.arrow_back_ios_new,
-            //     color: Colors.black,
-            //     size: 20,
-            //   ),
-            // ),
-          ),
-        ),
-        body: GoogleMap(
-          initialCameraPosition: const CameraPosition(
-            target: legoStore,
-            zoom: 17,
-          ),
-          markers: {
-            const Marker(
-              markerId: MarkerId('currentLocation'),
-              icon: BitmapDescriptor.defaultMarker,
-              position: legoStore,
-              infoWindow: InfoWindow(title: 'Lego Store'),
+        body: Stack(
+          children: [
+            GoogleMap(
+              initialCameraPosition: const CameraPosition(
+                target: legoStore,
+                zoom: 17,
+              ),
+              markers: {
+                const Marker(
+                  markerId: MarkerId('legoStore'),
+                  icon: BitmapDescriptor.defaultMarker,
+                  position: legoStore,
+                  infoWindow: InfoWindow(title: 'Lego Store'),
+                ),
+              },
             ),
-            // const Marker(
-            //   markerId: MarkerId('sourceLocation'),
-            //   icon: BitmapDescriptor.defaultMarker,
-            //   position: googlePlex,
-            // ),
-            // const Marker(
-            //   markerId: MarkerId('destinationLocation'),
-            //   icon: BitmapDescriptor.defaultMarker,
-            //   position: mountainView,
-            // )
-          },
+            const Positioned(
+              top: 50,
+              left: 25,
+              right: 25,
+              child: Card(
+                color: Colors.white,
+                child: Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Lego Store',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Lưu Hữu Phước, Đông Hoà, Dĩ An, Bình Dương',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       );
 
